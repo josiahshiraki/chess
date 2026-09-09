@@ -56,7 +56,7 @@ public class ChessPiece {
      * numbers.add(new int[]{3, 5});
      */
     public Collection<ChessMove> pieceMoves(ChessBoard board, ChessPosition myPosition) {
-        ArrayList<int[]> numbers = new ArrayList<>();
+        ArrayList<int[]> moves = new ArrayList<>();
         //throw new RuntimeException("Not implemented");
         switch(this.type){
             case KING:
@@ -74,5 +74,30 @@ public class ChessPiece {
         }
 
         return null;
+    }
+    //mutator for king_move board
+    private void king_moves(ArrayList<int[]> moves, ChessPosition pos){
+        int r = pos.getRow()-1;
+        int c = pos.getColumn()-1;
+        String [] edges = check_edge(r,c);
+
+    }
+
+    private String[] check_edge(int r, int c){
+        String [] ret_edges  = new String[2]; // first is top or bot flank, second is left or right flank, if none, NULL
+
+        if(r-1 == -1){
+            ret_edges[0] = "top";
+        }else if(r+1 == 8){
+            ret_edges[0] = "bot";
+        }
+
+        if(c-1 == -1){
+            ret_edges[1] = "left";
+        }else if(c+1 == 8){
+            ret_edges[1] = "right";
+        }
+
+        return ret_edges;
     }
 }
