@@ -91,7 +91,6 @@ public class ChessPiece {
         }else if(r+1 == 8){
             ret_edges[0] = "bot";
         }
-
         if(c-1 == -1){
             ret_edges[1] = "left";
         }else if(c+1 == 8){
