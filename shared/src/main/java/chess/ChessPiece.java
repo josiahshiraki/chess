@@ -1,5 +1,6 @@
 package chess;
 
+import java.util.ArrayList;
 import java.util.Collection;
 
 /**
@@ -51,8 +52,27 @@ public class ChessPiece {
      * danger
      *
      * @return Collection of valid moves
+     * Will return an ArrayList full of valid moves (coord (r,c)) for specific piece
+     * numbers.add(new int[]{3, 5});
      */
     public Collection<ChessMove> pieceMoves(ChessBoard board, ChessPosition myPosition) {
-        throw new RuntimeException("Not implemented");
+        ArrayList<int[]> numbers = new ArrayList<>();
+        //throw new RuntimeException("Not implemented");
+        switch(this.type){
+            case KING:
+                break;
+            case QUEEN:
+                break;
+            case ROOK:
+                break;
+            case BISHOP:
+                break;
+            case KNIGHT:
+                break;
+            case PAWN:
+                break;
+        }
+
+        return null;
     }
 }
