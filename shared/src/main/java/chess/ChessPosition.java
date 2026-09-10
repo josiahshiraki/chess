@@ -7,6 +7,7 @@ package chess;
  * signature of the existing methods.
  */
 public class ChessPosition {
+    //row and col given by conventional index starting at 1 and ending at len
     private final int row;
     private final int col;
     public ChessPosition(int row, int col) {
