@@ -79,24 +79,18 @@ public class ChessPiece {
     private void king_moves(ArrayList<int[]> moves, ChessPosition pos){
         int r = pos.getRow()-1;
         int c = pos.getColumn()-1;
-        String [] edges = check_edge(r,c);
+        int [][] adj_squares = {{r-1,c-1},{r-1,c},{r-1,c+1},
+                                {r,c-1},          {r,c+1},
+                                {r+1,c-1},{r+1,c},{r+1,c+1}};
+        for(int[] square: adj_squares){
+            if(square[0] == -1)continue;
+            if(square[1] == -1)continue;
+            if(square[0] == 8)continue;
+            if(square[1] == 8)continue;
 
-    }
+            moves.add(square);
 
-    private String[] check_edge(int r, int c){
-        String [] ret_edges  = new String[2]; // first is top or bot flank, second is left or right flank, if none, NULL
-
-        if(r-1 == -1){
-            ret_edges[0] = "top";
-        }else if(r+1 == 8){
-            ret_edges[0] = "bot";
-        }
-        if(c-1 == -1){
-            ret_edges[1] = "left";
-        }else if(c+1 == 8){
-            ret_edges[1] = "right";
         }
 
-        return ret_edges;
     }
 }
