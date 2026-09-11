@@ -79,25 +79,24 @@ public class ChessPiece {
      * |1|2 |3 |4 | 5| 6| 7| 8|
      */
     public Collection<ChessMove> pieceMoves(ChessBoard board, ChessPosition myPosition) {
-        ArrayList<int[]> moves = new ArrayList<>();
+        ArrayList<ChessMove> moves = new ArrayList<>();
         //throw new RuntimeException("Not implemented");
         switch(this.type){
             case KING:
-                king_moves(moves, myPosition);
                 break;
             case QUEEN:
                 break;
             case ROOK:
                 break;
             case BISHOP:
+                moves = diagonal_moves(board, myPosition);
                 break;
             case KNIGHT:
                 break;
             case PAWN:
                 break;
         }
-
-        return null;
+        return moves;
     }
     /**
      *helper for diagonal moves (queen and bishop)
@@ -115,51 +114,137 @@ public class ChessPiece {
      * @param pos (current chess position)
      * @return collection of valid diagonal moves
      */
-    private ArrayList<int[]> diagonal_moves(ChessBoard board, ChessPosition pos){//
-        ArrayList<int[]> moves = new ArrayList<>();
+
+    private ArrayList<ChessMove> diagonal_moves(ChessBoard board, ChessPosition pos){//
+        ArrayList<ChessMove> moves = new ArrayList<>();
+
+
         int r = pos.getRow();
         int c = pos.getColumn();
+        //ArrayList<ChessMove> moves, ChessBoard board, ChessPosition pos, int rDir, int cDir
+        get_diagonals(moves, board, pos, 1,1);
 
-        //determine the enemy color for capture
-        ChessGame.TeamColor enemyColor = ChessGame.TeamColor.BLACK;
-        if (this.pieceColor == ChessGame.TeamColor.BLACK) enemyColor = ChessGame.TeamColor.WHITE;
+//        //determine the enemy color for capture
+//        ChessGame.TeamColor enemyColor = ChessGame.TeamColor.BLACK;
+//        if (this.pieceColor == ChessGame.TeamColor.BLACK) enemyColor = ChessGame.TeamColor.WHITE;
+//
+//        //NorthEast Direction
+//        while(true) {
+//            if ((r + 1 == 9) || (c + 1 == 9)) {
+//                break;
+//
+//            } else if (board.getPiece(new ChessPosition(r + 1, c + 1)) != null) {
+//                if (board.getPiece(new ChessPosition(r + 1, c + 1)).pieceColor == enemyColor) {
+//                    moves.add(new ChessMove(pos, new ChessPosition(r + 1, c + 1), null));
+//                }
+//                break;
+//            } else {
+//                moves.add(new ChessMove(pos, new ChessPosition(r + 1, c + 1), null));
+//            }
+//            r++;
+//            c++;
+//        }
+//
+//        r = pos.getRow();
+//        c = pos.getColumn();
+//
+//        //SouthEast Direction
+//        while(true){
+//            if((r-1 == 0) || (c+1 == 9)){
+//                break;
+//
+//            }else if(board.getPiece(new ChessPosition(r-1,c+1)) != null){
+//                if(board.getPiece(new ChessPosition(r-1,c+1)).pieceColor == enemyColor){
+//                    moves.add(new ChessMove(pos,new ChessPosition(r-1,c+1), null));
+//                }
+//                break;
+//            }else{
+//                moves.add(new ChessMove(pos,new ChessPosition(r-1,c+1), null));
+//            }
+//            r--;
+//            c++;
+//        }
+//
+//        r = pos.getRow();
+//        c = pos.getColumn();
+//
+//        //SouthWest Direction
+//        while(true){
+//            if((r-1 == 0) || (c-1 == 0)){
+//                break;
+//
+//            }else if(board.getPiece(new ChessPosition(r-1,c-1)) != null){
+//                if(board.getPiece(new ChessPosition(r-1,c-1)).pieceColor == enemyColor){
+//                    moves.add(new ChessMove(pos,new ChessPosition(r,c), null));
+//                }
+//                break;
+//            }else{
+//                moves.add(new ChessMove(pos,new ChessPosition(r-1,c-1), null));
+//            }
+//            r--;
+//            c--;
+//        }
+//
+//
+//        r = pos.getRow();
+//        c = pos.getColumn();
+//        //NorthWest Direction
+//        while(true) {
+//            if ((r + 1 == 9) || (c - 1 == 0)) {
+//                break;
+//
+//            } else if (board.getPiece(new ChessPosition(r + 1, c - 1)) != null) {
+//                if (board.getPiece(new ChessPosition(r + 1, c - 1)).pieceColor == enemyColor) {
+//                    moves.add(new ChessMove(pos, new ChessPosition(r, c), null));
+//                }
+//                break;
+//            } else {
+//                moves.add(new ChessMove(pos, new ChessPosition(r + 1, c - 1), null));
+//            }
+//            r++;
+//            c--;
+//        }
+        for(int i = 0; i < moves.size();i++){
+            //System.out.println("start row: " +moves.get(i).getStartPosition().getRow() + " move col: " + moves.get(i).getStartPosition().getColumn());
+            System.out.println("move row: " +moves.get(i).getEndPosition().getRow() + " move col: " + moves.get(i).getEndPosition().getColumn());
 
-        while(true){
-            if((r+1 == 9) || (c+1 == 9)){ //check if on edge
-                break;
-            }else if(board.getPiece(pos) != null){
-                if(board.getPiece(pos).pieceColor == enemyColor){
-                    moves.add(new int[]{r,c});
-                }
-                break;
-            }else{
-                moves.add(new int[]{r,c});
-            }
-            r++;
-            c++;
         }
+
         return moves;
     }
 
-    //mutator for king_move board
-    private void king_moves(ArrayList<int[]> moves, ChessPosition pos){
+    /**
+     * @param moves mutates that move arraylist
+     * @param board check piece positions
+     * @param pos check curr piece position
+     * @param rDir up +1 or down -1 direction
+     * @param cDir left -1 or right +1 direction
+     */
+    private void get_diagonals(ArrayList<ChessMove> moves, ChessBoard board, ChessPosition pos, int rDir, int cDir){
         int r = pos.getRow();
         int c = pos.getColumn();
-        int [][] adj_squares = {{r+1,c-1},{r+1,c},{r+1,c+1},
-                                {r,c-1},          {r,c+1},
-                                {r-1,c-1},{r-1,c},{r-1,c+1}};
-        for(int[] square: adj_squares){
-            if((square[0] == 0) || (square[1] == 0) || (square[0] == 9) || (square[1] == 9))continue; //check bounds
-            //if(same-color piece in adj_squares)continue;
-            //if(king will be in check if move to that square)continue;
+        ChessGame.TeamColor enemyColor = ChessGame.TeamColor.BLACK;
+        if (this.pieceColor == ChessGame.TeamColor.BLACK) enemyColor = ChessGame.TeamColor.WHITE;
 
-            moves.add(square);
+        int vertBound = 0;
+        if (rDir > 0)vertBound = 9;
+        int horBound = 0;
+        if(cDir > 0)horBound = 9;
+
+        while(true) {
+            if ((r+rDir == vertBound) || (c+cDir == horBound)) {
+                break;
+
+            } else if (board.getPiece(new ChessPosition(r+rDir, c+cDir)) != null) {
+                if (board.getPiece(new ChessPosition(r+rDir, c+cDir)).pieceColor == enemyColor) {
+                    moves.add(new ChessMove(pos, new ChessPosition(r+rDir, c+cDir), null));
+                }
+                break;
+            } else {
+                moves.add(new ChessMove(pos, new ChessPosition(r+rDir, c+cDir), null));
+            }
+            r+=rDir;
+            c+=cDir;
         }
-
     }
 }
-
-
-//            if(square[1] == -1)continue;
-//            if(square[0] == 8)continue;
-//            if(square[1] == 8)continue;
