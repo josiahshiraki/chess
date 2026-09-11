@@ -118,99 +118,19 @@ public class ChessPiece {
     private ArrayList<ChessMove> diagonal_moves(ChessBoard board, ChessPosition pos){//
         ArrayList<ChessMove> moves = new ArrayList<>();
 
+        getMovesInDirection(moves, board, pos, 1,1); //NE Direction
+        getMovesInDirection(moves, board, pos, -1,1); //SE Direction
+        getMovesInDirection(moves, board, pos, -1,-1); //SW Direction
+        getMovesInDirection(moves, board, pos, 1,-1); //NW Direction
 
-        int r = pos.getRow();
-        int c = pos.getColumn();
-        //ArrayList<ChessMove> moves, ChessBoard board, ChessPosition pos, int rDir, int cDir
-        get_diagonals(moves, board, pos, 1,1);
+        return moves;
+    }
 
-//        //determine the enemy color for capture
-//        ChessGame.TeamColor enemyColor = ChessGame.TeamColor.BLACK;
-//        if (this.pieceColor == ChessGame.TeamColor.BLACK) enemyColor = ChessGame.TeamColor.WHITE;
-//
-//        //NorthEast Direction
-//        while(true) {
-//            if ((r + 1 == 9) || (c + 1 == 9)) {
-//                break;
-//
-//            } else if (board.getPiece(new ChessPosition(r + 1, c + 1)) != null) {
-//                if (board.getPiece(new ChessPosition(r + 1, c + 1)).pieceColor == enemyColor) {
-//                    moves.add(new ChessMove(pos, new ChessPosition(r + 1, c + 1), null));
-//                }
-//                break;
-//            } else {
-//                moves.add(new ChessMove(pos, new ChessPosition(r + 1, c + 1), null));
-//            }
-//            r++;
-//            c++;
-//        }
-//
-//        r = pos.getRow();
-//        c = pos.getColumn();
-//
-//        //SouthEast Direction
-//        while(true){
-//            if((r-1 == 0) || (c+1 == 9)){
-//                break;
-//
-//            }else if(board.getPiece(new ChessPosition(r-1,c+1)) != null){
-//                if(board.getPiece(new ChessPosition(r-1,c+1)).pieceColor == enemyColor){
-//                    moves.add(new ChessMove(pos,new ChessPosition(r-1,c+1), null));
-//                }
-//                break;
-//            }else{
-//                moves.add(new ChessMove(pos,new ChessPosition(r-1,c+1), null));
-//            }
-//            r--;
-//            c++;
-//        }
-//
-//        r = pos.getRow();
-//        c = pos.getColumn();
-//
-//        //SouthWest Direction
-//        while(true){
-//            if((r-1 == 0) || (c-1 == 0)){
-//                break;
-//
-//            }else if(board.getPiece(new ChessPosition(r-1,c-1)) != null){
-//                if(board.getPiece(new ChessPosition(r-1,c-1)).pieceColor == enemyColor){
-//                    moves.add(new ChessMove(pos,new ChessPosition(r,c), null));
-//                }
-//                break;
-//            }else{
-//                moves.add(new ChessMove(pos,new ChessPosition(r-1,c-1), null));
-//            }
-//            r--;
-//            c--;
-//        }
-//
-//
-//        r = pos.getRow();
-//        c = pos.getColumn();
-//        //NorthWest Direction
-//        while(true) {
-//            if ((r + 1 == 9) || (c - 1 == 0)) {
-//                break;
-//
-//            } else if (board.getPiece(new ChessPosition(r + 1, c - 1)) != null) {
-//                if (board.getPiece(new ChessPosition(r + 1, c - 1)).pieceColor == enemyColor) {
-//                    moves.add(new ChessMove(pos, new ChessPosition(r, c), null));
-//                }
-//                break;
-//            } else {
-//                moves.add(new ChessMove(pos, new ChessPosition(r + 1, c - 1), null));
-//            }
-//            r++;
-//            c--;
-//        }
+    private void print_directions(ArrayList<ChessMove> moves){
         for(int i = 0; i < moves.size();i++){
             //System.out.println("start row: " +moves.get(i).getStartPosition().getRow() + " move col: " + moves.get(i).getStartPosition().getColumn());
             System.out.println("move row: " +moves.get(i).getEndPosition().getRow() + " move col: " + moves.get(i).getEndPosition().getColumn());
-
         }
-
-        return moves;
     }
 
     /**
@@ -220,15 +140,15 @@ public class ChessPiece {
      * @param rDir up +1 or down -1 direction
      * @param cDir left -1 or right +1 direction
      */
-    private void get_diagonals(ArrayList<ChessMove> moves, ChessBoard board, ChessPosition pos, int rDir, int cDir){
+    private void getMovesInDirection(ArrayList<ChessMove> moves, ChessBoard board, ChessPosition pos, int rDir, int cDir){
         int r = pos.getRow();
         int c = pos.getColumn();
         ChessGame.TeamColor enemyColor = ChessGame.TeamColor.BLACK;
         if (this.pieceColor == ChessGame.TeamColor.BLACK) enemyColor = ChessGame.TeamColor.WHITE;
 
         int vertBound = 0;
-        if (rDir > 0)vertBound = 9;
         int horBound = 0;
+        if (rDir > 0)vertBound = 9;
         if(cDir > 0)horBound = 9;
 
         while(true) {
