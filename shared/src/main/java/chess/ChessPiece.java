@@ -85,11 +85,28 @@ public class ChessPiece {
             case KING:
                 break;
             case QUEEN:
+                getMovesInDirection(moves, board, myPosition, 1,0); //N Direction
+                getMovesInDirection(moves, board, myPosition, 0,1); //E Direction
+                getMovesInDirection(moves, board, myPosition, -1,0); //S Direction
+                getMovesInDirection(moves, board, myPosition, 0,-1); //W Direction
+
+                getMovesInDirection(moves, board, myPosition, 1,1); //NE Direction
+                getMovesInDirection(moves, board, myPosition, -1,1); //SE Direction
+                getMovesInDirection(moves, board, myPosition, -1,-1); //SW Direction
+                getMovesInDirection(moves, board, myPosition, 1,-1); //NW Direction
+                print_directions(moves);
                 break;
             case ROOK:
+                getMovesInDirection(moves, board, myPosition, 1,0); //N Direction
+                getMovesInDirection(moves, board, myPosition, 0,1); //E Direction
+                getMovesInDirection(moves, board, myPosition, -1,0); //S Direction
+                getMovesInDirection(moves, board, myPosition, 0,-1); //W Direction
                 break;
             case BISHOP:
-                moves = diagonal_moves(board, myPosition);
+                getMovesInDirection(moves, board, myPosition, 1,1); //NE Direction
+                getMovesInDirection(moves, board, myPosition, -1,1); //SE Direction
+                getMovesInDirection(moves, board, myPosition, -1,-1); //SW Direction
+                getMovesInDirection(moves, board, myPosition, 1,-1); //NW Direction
                 break;
             case KNIGHT:
                 break;
@@ -98,39 +115,15 @@ public class ChessPiece {
         }
         return moves;
     }
-    /**
-     *helper for diagonal moves (queen and bishop)
-     *      * |8| *|  |  |  |  |  | *|
-     *      * |7|  | *|  |  |  | *|  |
-     *      * |6|  |  |* |  | *|  |  |
-     *      * |5|  |  |  | B|  |  |  |
-     *      * |4|  |  | *|  | *|  |  |
-     *      * |3|  | *|  |  |  | *|  |
-     *      * |2| *|  |  |  |  |  | *|
-     *      * |1|2 |3 |4 | 5| 6| 7| 8|
-     * use 4 while loops, each traveling in the NE, SE, SW, and NW direction
-     * for loops will break for the following conditions: if it reaches the end of the board or reaches another piece (if enemy, include that square too)
-     *
-     * @param pos (current chess position)
-     * @return collection of valid diagonal moves
-     */
 
-    private ArrayList<ChessMove> diagonal_moves(ChessBoard board, ChessPosition pos){//
-        ArrayList<ChessMove> moves = new ArrayList<>();
 
-        getMovesInDirection(moves, board, pos, 1,1); //NE Direction
-        getMovesInDirection(moves, board, pos, -1,1); //SE Direction
-        getMovesInDirection(moves, board, pos, -1,-1); //SW Direction
-        getMovesInDirection(moves, board, pos, 1,-1); //NW Direction
-
-        return moves;
-    }
 
     private void print_directions(ArrayList<ChessMove> moves){
         for(int i = 0; i < moves.size();i++){
             //System.out.println("start row: " +moves.get(i).getStartPosition().getRow() + " move col: " + moves.get(i).getStartPosition().getColumn());
             System.out.println("move row: " +moves.get(i).getEndPosition().getRow() + " move col: " + moves.get(i).getEndPosition().getColumn());
         }
+        System.out.println(moves.size());
     }
 
     /**
@@ -143,7 +136,8 @@ public class ChessPiece {
     private void getMovesInDirection(ArrayList<ChessMove> moves, ChessBoard board, ChessPosition pos, int rDir, int cDir){
         int r = pos.getRow();
         int c = pos.getColumn();
-        ChessGame.TeamColor enemyColor = ChessGame.TeamColor.BLACK;
+
+        ChessGame.TeamColor enemyColor = ChessGame.TeamColor.BLACK; // maybe could become a private in class var because always be opposite of current color
         if (this.pieceColor == ChessGame.TeamColor.BLACK) enemyColor = ChessGame.TeamColor.WHITE;
 
         int vertBound = 0;
