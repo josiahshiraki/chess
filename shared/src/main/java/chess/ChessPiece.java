@@ -94,7 +94,6 @@ public class ChessPiece {
                 getMovesInDirection(moves, board, myPosition, -1,1); //SE Direction
                 getMovesInDirection(moves, board, myPosition, -1,-1); //SW Direction
                 getMovesInDirection(moves, board, myPosition, 1,-1); //NW Direction
-                print_directions(moves);
                 break;
             case ROOK:
                 getMovesInDirection(moves, board, myPosition, 1,0); //N Direction
@@ -109,6 +108,8 @@ public class ChessPiece {
                 getMovesInDirection(moves, board, myPosition, 1,-1); //NW Direction
                 break;
             case KNIGHT:
+                knight_move(board, moves, myPosition);
+                print_directions(moves);
                 break;
             case PAWN:
                 break;
@@ -116,11 +117,54 @@ public class ChessPiece {
         return moves;
     }
 
+    /**
+     * |8|  |  |  |  |  |  |  |
+     * |7|  |  | *|  | *|  |  |
+     * |6|  | *|  |  |  | *|  |
+     * |5|  |  |  | k|  |  |  |
+     * |4|  | *|  |  |  | *|  |
+     * |3|  |  | *|  | *|  |  |
+     * |2|  |  |  |  |  |  |  |
+     * |1|2 |3 |4 | 5| 6| 7| 8|
+     * @param moves list to mutate
+     * @param pos current chess position on board
+     */
+    private void knight_move(ChessBoard board, ArrayList<ChessMove> moves, ChessPosition pos){
+        int r = pos.getRow();
+        int c = pos.getColumn();
+        int [][] possibleMoves =    {
+                                    {r+2,c-1},{r+2,c+1},
+                                    {r+1,c+2},{r-1,c+2},
+                                    {r-2,c+1},{r-2,c-1},
+                                    {r-1,c-2},{r+1,c-2}
+                                    };
+
+        ChessGame.TeamColor enemyColor = ChessGame.TeamColor.BLACK; // maybe could become a private in class var because always be opposite of current color
+        if (this.pieceColor == ChessGame.TeamColor.BLACK) enemyColor = ChessGame.TeamColor.WHITE;
+
+        for(int i = 0; i < possibleMoves.length; i++){
+            if((possibleMoves[i][0] <= 0) || (possibleMoves[i][0] >= 8))continue;
+            if((possibleMoves[i][1] <= 0) || (possibleMoves[i][1] >= 8))continue;
 
 
+            ChessPosition check = new ChessPosition(possibleMoves[i][0],possibleMoves[i][1]);
+            if(board.getPiece(check) != null){
+                if (board.getPiece(check).pieceColor == enemyColor){
+                    moves.add(new ChessMove(pos, check, null));
+                }
+            }else{
+                moves.add(new ChessMove(pos, check, null));
+            }
+        }
+    }
+
+    //for debugging
     private void print_directions(ArrayList<ChessMove> moves){
         for(int i = 0; i < moves.size();i++){
-            //System.out.println("start row: " +moves.get(i).getStartPosition().getRow() + " move col: " + moves.get(i).getStartPosition().getColumn());
+            if(i == 0) {
+                System.out.println("start row: " + moves.get(i).getStartPosition().getRow() + " start col: " + moves.get(i).getStartPosition().getRow());
+                System.out.println("----------------------");
+            }
             System.out.println("move row: " +moves.get(i).getEndPosition().getRow() + " move col: " + moves.get(i).getEndPosition().getColumn());
         }
         System.out.println(moves.size());
