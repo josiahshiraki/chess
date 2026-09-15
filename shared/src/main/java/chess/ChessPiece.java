@@ -33,6 +33,14 @@ public class ChessPiece {
         return Objects.hash(pieceColor, type);
     }
 
+    @Override
+    public String toString() {
+        if(pieceColor == ChessGame.TeamColor.BLACK){
+            return "B" + type;
+        }
+        return "" + type;
+    }
+
     /**
      * The various different chess piece options
      */
@@ -83,6 +91,7 @@ public class ChessPiece {
         //throw new RuntimeException("Not implemented");
         switch(this.type){
             case KING:
+                king_move(board,moves, myPosition);
                 break;
             case QUEEN:
                 getMovesInDirection(moves, board, myPosition, 1,0); //N Direction
@@ -109,12 +118,37 @@ public class ChessPiece {
                 break;
             case KNIGHT:
                 knight_move(board, moves, myPosition);
-                print_directions(moves);
                 break;
             case PAWN:
                 break;
         }
+        System.out.println("Size: " + moves.size());
         return moves;
+    }
+
+    /**
+     *
+     * |8|  | B|LA|CK|  |  |  |
+     * |7|  |  |  |  |  |  |  |
+     * |6|  |  |  |  |  |  |  |
+     * |5|  |  |  |  |  |  |  |
+     * |4|  |  | E| *| E|  | *|
+     * |3|  |  |  | p|  |  | *|
+     * |2|  | W|HI|TE|  |  | p|
+     * |1|2 |3 |4 | 5| 6| 7| 8|
+     *
+     * @param board get pieces
+     * @param moves mutate for possible moves
+     * @param pos current positon of the pawn
+     */
+    private void pawnMoveWhite(ChessBoard board, ArrayList<ChessMove> moves, ChessPosition pos){
+        int r = pos.getRow();
+        int c = pos.getColumn();
+        ArrayList<int[]> possibleMoves = new ArrayList<>();
+        possibleMoves.add(new int[]{r+1,c});
+        if(r==2)possibleMoves.add(new int[]{r+2,c});
+
+        //int[][] possibleMoves = {{r+1,c},{r+2,c},{r+1,c-1},{r+1,c+1}};
     }
 
     /**
@@ -140,16 +174,33 @@ public class ChessPiece {
                                     };
 
         ChessGame.TeamColor enemyColor = ChessGame.TeamColor.BLACK; // maybe could become a private in class var because always be opposite of current color
+        if (this.pieceColor == ChessGame.TeamColor.BLACK) enemyColor = ChessGame.TeamColor.WHITE; // make this into query
+
+        get_valid_moves(board, possibleMoves, moves, enemyColor, pos);
+    }
+
+    private void king_move(ChessBoard board, ArrayList<ChessMove> moves, ChessPosition pos){
+        int r = pos.getRow();
+        int c = pos.getColumn();
+        int [][] possibleMoves = {{r+1,c-1}, {r+1,c},{r+1,c+1},{r,c+1},{r-1,c+1},{r-1,c},{r-1,c-1},{r,c-1}};
+        for(int i = 0; i < possibleMoves.length; i++){
+            System.out.println("possible moves -> "+ "row: " + possibleMoves[i][0] + " col: " +possibleMoves[i][1]);
+        }
+        ChessGame.TeamColor enemyColor = ChessGame.TeamColor.BLACK; // maybe could become a private in class var because always be opposite of current color
         if (this.pieceColor == ChessGame.TeamColor.BLACK) enemyColor = ChessGame.TeamColor.WHITE;
 
+        get_valid_moves(board,possibleMoves, moves, enemyColor, pos);
+    }
+
+
+    // abstracted method to use for knight, pawn, king with one set of moves, not continuous
+    private void get_valid_moves(ChessBoard board, int[][] possibleMoves, ArrayList<ChessMove> moves, ChessGame.TeamColor enemyColor, ChessPosition pos){
         for(int i = 0; i < possibleMoves.length; i++){
-            if((possibleMoves[i][0] <= 0) || (possibleMoves[i][0] >= 8))continue;
-            if((possibleMoves[i][1] <= 0) || (possibleMoves[i][1] >= 8))continue;
-
-
-            ChessPosition check = new ChessPosition(possibleMoves[i][0],possibleMoves[i][1]);
-            if(board.getPiece(check) != null){
-                if (board.getPiece(check).pieceColor == enemyColor){
+            if((possibleMoves[i][0] <= 0) || (possibleMoves[i][0] > 8))continue; //rejects all off board moves
+            if((possibleMoves[i][1] <= 0) || (possibleMoves[i][1] > 8))continue;
+            ChessPosition check = new ChessPosition(possibleMoves[i][0], possibleMoves[i][1]);
+            if(board.getPiece(check) != null){ //checks if there is a piece on a square
+                if (board.getPiece(check).pieceColor == enemyColor){ //checks if that piece is an enemy piece
                     moves.add(new ChessMove(pos, check, null));
                 }
             }else{
@@ -158,17 +209,7 @@ public class ChessPiece {
         }
     }
 
-    //for debugging
-    private void print_directions(ArrayList<ChessMove> moves){
-        for(int i = 0; i < moves.size();i++){
-            if(i == 0) {
-                System.out.println("start row: " + moves.get(i).getStartPosition().getRow() + " start col: " + moves.get(i).getStartPosition().getRow());
-                System.out.println("----------------------");
-            }
-            System.out.println("move row: " +moves.get(i).getEndPosition().getRow() + " move col: " + moves.get(i).getEndPosition().getColumn());
-        }
-        System.out.println(moves.size());
-    }
+
 
     /**
      * @param moves mutates that move arraylist
@@ -184,7 +225,7 @@ public class ChessPiece {
         ChessGame.TeamColor enemyColor = ChessGame.TeamColor.BLACK; // maybe could become a private in class var because always be opposite of current color
         if (this.pieceColor == ChessGame.TeamColor.BLACK) enemyColor = ChessGame.TeamColor.WHITE;
 
-        int vertBound = 0;
+        int vertBound = 0; //make into query, eliminate the if statements
         int horBound = 0;
         if (rDir > 0)vertBound = 9;
         if(cDir > 0)horBound = 9;
