@@ -79,64 +79,47 @@ public class ChessPiece {
      * @return Collection of valid moves
      * Will return an ArrayList full of valid moves (coord (r,c)) for specific piece
      * numbers.add(new int[]{3, 5});
-     * |8|  |  |  |  |  |  |  |
-     * |7|  |  |  |  |  |  |  |
-     * |6|  |  |  |  |  |  |  |
-     * |5|  |  |  |  |  |  |  |
-     * |4|  |  |  |  |  |  |  |
-     * |3|  |  |  |  |  |  |  |
-     * |2|  |  |  |  |  |  |  |
-     * |1|2 |3 |4 | 5| 6| 7| 8|
      */
     public Collection<ChessMove> pieceMoves(ChessBoard board, ChessPosition myPosition) {
+        ChessGame.TeamColor enemyColor = (this.pieceColor == ChessGame.TeamColor.BLACK) ? ChessGame.TeamColor.WHITE : ChessGame.TeamColor.BLACK;
         ArrayList<ChessMove> moves = new ArrayList<>();
-        //throw new RuntimeException("Not implemented");
         switch(this.type){
             case KING:
-                king_move(board,moves, myPosition);
+                king_move(board,moves, myPosition, enemyColor);
                 break;
             case QUEEN:
-                getMovesInDirection(moves, board, myPosition, 1,0); //N Direction
-                getMovesInDirection(moves, board, myPosition, 0,1); //E Direction
-                getMovesInDirection(moves, board, myPosition, -1,0); //S Direction
-                getMovesInDirection(moves, board, myPosition, 0,-1); //W Direction
+                getMovesInDirection(moves, board, myPosition, 1,0, enemyColor); //N Direction
+                getMovesInDirection(moves, board, myPosition, 0,1, enemyColor); //E Direction
+                getMovesInDirection(moves, board, myPosition, -1,0, enemyColor); //S Direction
+                getMovesInDirection(moves, board, myPosition, 0,-1, enemyColor); //W Direction
 
-                getMovesInDirection(moves, board, myPosition, 1,1); //NE Direction
-                getMovesInDirection(moves, board, myPosition, -1,1); //SE Direction
-                getMovesInDirection(moves, board, myPosition, -1,-1); //SW Direction
-                getMovesInDirection(moves, board, myPosition, 1,-1); //NW Direction
+                getMovesInDirection(moves, board, myPosition, 1,1, enemyColor); //NE Direction
+                getMovesInDirection(moves, board, myPosition, -1,1, enemyColor); //SE Direction
+                getMovesInDirection(moves, board, myPosition, -1,-1, enemyColor); //SW Direction
+                getMovesInDirection(moves, board, myPosition, 1,-1, enemyColor); //NW Direction
                 break;
             case ROOK:
-                getMovesInDirection(moves, board, myPosition, 1,0); //N Direction
-                getMovesInDirection(moves, board, myPosition, 0,1); //E Direction
-                getMovesInDirection(moves, board, myPosition, -1,0); //S Direction
-                getMovesInDirection(moves, board, myPosition, 0,-1); //W Direction
+                getMovesInDirection(moves, board, myPosition, 1,0, enemyColor); //N Direction
+                getMovesInDirection(moves, board, myPosition, 0,1, enemyColor); //E Direction
+                getMovesInDirection(moves, board, myPosition, -1,0, enemyColor); //S Direction
+                getMovesInDirection(moves, board, myPosition, 0,-1, enemyColor); //W Direction
                 break;
             case BISHOP:
-                getMovesInDirection(moves, board, myPosition, 1,1); //NE Direction
-                getMovesInDirection(moves, board, myPosition, -1,1); //SE Direction
-                getMovesInDirection(moves, board, myPosition, -1,-1); //SW Direction
-                getMovesInDirection(moves, board, myPosition, 1,-1); //NW Direction
+                getMovesInDirection(moves, board, myPosition, 1,1, enemyColor); //NE Direction
+                getMovesInDirection(moves, board, myPosition, -1,1, enemyColor); //SE Direction
+                getMovesInDirection(moves, board, myPosition, -1,-1, enemyColor); //SW Direction
+                getMovesInDirection(moves, board, myPosition, 1,-1, enemyColor); //NW Direction
                 break;
             case KNIGHT:
-                knight_move(board, moves, myPosition);
+                knight_move(board, moves, myPosition, enemyColor);
                 break;
             case PAWN:
                 break;
         }
-        System.out.println("Size: " + moves.size());
         return moves;
     }
 
     /**
-     * |8|  | B|LA|CK|  |  |  |
-     * |7|  |  |  |  |  |  |  |
-     * |6|  |  |  |  |  |  |  |
-     * |5|  |  |  |  |  |  |  |
-     * |4|  |  | E| *| E|  | *|
-     * |3|  |  |  | p|  |  | *|
-     * |2|  | W|HI|TE|  |  | p|
-     * |1|2 |3 |4 | 5| 6| 7| 8|
      * @param board get pieces
      * @param moves mutate for possible moves
      * @param pos current positon of the pawn
@@ -153,40 +136,20 @@ public class ChessPiece {
 //    }
 
     /**
-     * |8|  |  |  |  |  |  |  |
-     * |7|  |  | *|  | *|  |  |
-     * |6|  | *|  |  |  | *|  |
-     * |5|  |  |  | k|  |  |  |
-     * |4|  | *|  |  |  | *|  |
-     * |3|  |  | *|  | *|  |  |
-     * |2|  |  |  |  |  |  |  |
-     * |1|2 |3 |4 | 5| 6| 7| 8|
      * @param moves list to mutate
      * @param pos current chess position on board
      */
-    private void knight_move(ChessBoard board, ArrayList<ChessMove> moves, ChessPosition pos){
+    private void knight_move(ChessBoard board, ArrayList<ChessMove> moves, ChessPosition pos, ChessGame.TeamColor enemyColor){
         int r = pos.getRow();
         int c = pos.getColumn();
-        int [][] possibleMoves =    {
-                                    {r+2,c-1},{r+2,c+1},
-                                    {r+1,c+2},{r-1,c+2},
-                                    {r-2,c+1},{r-2,c-1},
-                                    {r-1,c-2},{r+1,c-2}
-                                    };
-
-        ChessGame.TeamColor enemyColor = ChessGame.TeamColor.BLACK; // maybe could become a private in class var because always be opposite of current color
-        if (this.pieceColor == ChessGame.TeamColor.BLACK) enemyColor = ChessGame.TeamColor.WHITE; // make this into query
-
+        int [][] possibleMoves =    {{r+2,c-1},{r+2,c+1}, {r+1,c+2},{r-1,c+2}, {r-2,c+1},{r-2,c-1}, {r-1,c-2},{r+1,c-2}};
         get_valid_moves(board, possibleMoves, moves, enemyColor, pos);
     }
 
-    private void king_move(ChessBoard board, ArrayList<ChessMove> moves, ChessPosition pos){
+    private void king_move(ChessBoard board, ArrayList<ChessMove> moves, ChessPosition pos,ChessGame.TeamColor enemyColor){
         int r = pos.getRow();
         int c = pos.getColumn();
         int [][] possibleMoves = {{r+1,c-1}, {r+1,c},{r+1,c+1},{r,c+1},{r-1,c+1},{r-1,c},{r-1,c-1},{r,c-1}};
-        ChessGame.TeamColor enemyColor = ChessGame.TeamColor.BLACK; // maybe could become a private in class var because always be opposite of current color
-        if (this.pieceColor == ChessGame.TeamColor.BLACK) enemyColor = ChessGame.TeamColor.WHITE;
-
         get_valid_moves(board,possibleMoves, moves, enemyColor, pos);
     }
 
@@ -207,8 +170,6 @@ public class ChessPiece {
         }
     }
 
-
-
     /**
      * @param moves mutates that move arraylist
      * @param board check piece positions
@@ -216,12 +177,9 @@ public class ChessPiece {
      * @param rDir up +1 or down -1 direction
      * @param cDir left -1 or right +1 direction
      */
-    private void getMovesInDirection(ArrayList<ChessMove> moves, ChessBoard board, ChessPosition pos, int rDir, int cDir){
+    private void getMovesInDirection(ArrayList<ChessMove> moves, ChessBoard board, ChessPosition pos, int rDir, int cDir, ChessGame.TeamColor enemyColor){
         int r = pos.getRow();
         int c = pos.getColumn();
-
-        ChessGame.TeamColor enemyColor = ChessGame.TeamColor.BLACK; // maybe could become a private in class var because always be opposite of current color
-        if (this.pieceColor == ChessGame.TeamColor.BLACK) enemyColor = ChessGame.TeamColor.WHITE;
 
         int vertBound = 0; //make into query, eliminate the if statements
         int horBound = 0;
