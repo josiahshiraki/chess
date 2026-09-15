@@ -4,6 +4,8 @@ import java.util.ArrayList;
 import java.util.Collection;
 import java.util.Objects;
 
+
+
 /**
  * Represents a single chess piece
  * <p>
@@ -127,7 +129,6 @@ public class ChessPiece {
     }
 
     /**
-     *
      * |8|  | B|LA|CK|  |  |  |
      * |7|  |  |  |  |  |  |  |
      * |6|  |  |  |  |  |  |  |
@@ -136,20 +137,20 @@ public class ChessPiece {
      * |3|  |  |  | p|  |  | *|
      * |2|  | W|HI|TE|  |  | p|
      * |1|2 |3 |4 | 5| 6| 7| 8|
-     *
      * @param board get pieces
      * @param moves mutate for possible moves
      * @param pos current positon of the pawn
      */
-    private void pawnMoveWhite(ChessBoard board, ArrayList<ChessMove> moves, ChessPosition pos){
-        int r = pos.getRow();
-        int c = pos.getColumn();
-        ArrayList<int[]> possibleMoves = new ArrayList<>();
-        possibleMoves.add(new int[]{r+1,c});
-        if(r==2)possibleMoves.add(new int[]{r+2,c});
 
-        //int[][] possibleMoves = {{r+1,c},{r+2,c},{r+1,c-1},{r+1,c+1}};
-    }
+//    private void pawnMoveWhite(ChessBoard board, ArrayList<ChessMove> moves, ChessPosition pos){
+//        int r = pos.getRow();
+//        int c = pos.getColumn();
+//        ArrayList<int[]> possibleMoves = new ArrayList<>();
+//        possibleMoves.add(new int[]{r+1,c});
+//        if(r==2)possibleMoves.add(new int[]{r+2,c});
+//
+//        //int[][] possibleMoves = {{r+1,c},{r+2,c},{r+1,c-1},{r+1,c+1}};
+//    }
 
     /**
      * |8|  |  |  |  |  |  |  |
@@ -183,9 +184,6 @@ public class ChessPiece {
         int r = pos.getRow();
         int c = pos.getColumn();
         int [][] possibleMoves = {{r+1,c-1}, {r+1,c},{r+1,c+1},{r,c+1},{r-1,c+1},{r-1,c},{r-1,c-1},{r,c-1}};
-        for(int i = 0; i < possibleMoves.length; i++){
-            System.out.println("possible moves -> "+ "row: " + possibleMoves[i][0] + " col: " +possibleMoves[i][1]);
-        }
         ChessGame.TeamColor enemyColor = ChessGame.TeamColor.BLACK; // maybe could become a private in class var because always be opposite of current color
         if (this.pieceColor == ChessGame.TeamColor.BLACK) enemyColor = ChessGame.TeamColor.WHITE;
 
