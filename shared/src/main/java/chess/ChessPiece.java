@@ -103,54 +103,78 @@ public class ChessPiece {
                 knight_move(board, moves, myPosition, enemyColor);
                 break;
             case PAWN:
+                if(this.pieceColor == ChessGame.TeamColor.WHITE){
+                    pawnMoveWhite(board,moves,myPosition, enemyColor);
+                }else {
+                    pawnMoveBlack(board, moves, myPosition, enemyColor);
+                }
                 break;
         }
         return moves;
     }
+    private void pawnMoveBlack(ChessBoard board, ArrayList<ChessMove> moves, ChessPosition pos, ChessGame.TeamColor enemyColor){
+        int r = pos.getRow();
+        int c = pos.getColumn();
+        //to check possible move squares if there is a piece to capture or your own piece in the way
+        ChessPiece captureR = (c-1 == 0) ? null : board.getPiece(new ChessPosition(r-1,c-1));
+        ChessPiece captureL = (c+1 == 9) ? null : board.getPiece(new ChessPosition(r-1, c+1));
+        ChessPiece move1 = board.getPiece(new ChessPosition(r+1, c));
 
-    /**
-     * @param board get pieces
-     * @param moves mutate for possible moves
-     * @param pos current positon of the pawn
-     */
+        if(move1 == null) {
+            promotions(moves, pos, r, c, 1);
+        }
+        //move2
+        if(r == 7 && board.getPiece(new ChessPosition(r-1, c)) == null){
+            if(board.getPiece(new ChessPosition(r-2, c)) == null){
+                moves.add(new ChessMove(pos, new ChessPosition(r-2, c), null));
+            }
+        }
+        if(captureR != null && captureR.getTeamColor() == enemyColor){
+            promotions(moves, pos, r, c+1,1);
+        }
+        if(captureL != null && captureL.getTeamColor() == enemyColor){
+            promotions(moves, pos, r,c-1,1);
+        }
+    }
 
     private void pawnMoveWhite(ChessBoard board, ArrayList<ChessMove> moves, ChessPosition pos, ChessGame.TeamColor enemyColor){
         int r = pos.getRow();
         int c = pos.getColumn();
-//        ArrayList<int[]> possibleMoves = new ArrayList<>();
-
         //to check possible move squares if there is a piece to capture or your own piece in the way
         ChessPiece captureL = (c-1 == 0) ? null : board.getPiece(new ChessPosition(r+1,c-1));
         ChessPiece captureR = (c+1 == 9) ? null : board.getPiece(new ChessPosition(r+1, c+1));
         ChessPiece move1 = board.getPiece(new ChessPosition(r+1, c));
 
+        if(move1 == null) {
+            promotions(moves, pos, r, c,8);
+        }
         //move2
-        if(board.getPiece(new ChessPosition(r+1, c)) != null){
-            if(board.getPiece(new ChessPosition(r+2, c)) != null){
+        if(r == 2 && board.getPiece(new ChessPosition(r+1, c)) == null){
+            if(board.getPiece(new ChessPosition(r+2, c)) == null){
                 moves.add(new ChessMove(pos, new ChessPosition(r+2, c), null));
             }
         }
-
-        PieceType [] bigBoys = {PieceType.BISHOP, PieceType.ROOK, PieceType.KNIGHT, PieceType.QUEEN};
-
         if(captureL != null && captureL.getTeamColor() == enemyColor){
-            for(PieceType toPromote : bigBoys){
-                ChessMove toAdd = new ChessMove(pos, new ChessPosition(r+1, r-1), toPromote);
-                moves.add(toAdd);
-            }
-
+            promotions(moves, pos, r, c-1, 8);
         }
         if(captureR != null && captureR.getTeamColor() == enemyColor){
-            for(PieceType toPromote : bigBoys){
-                ChessMove toAdd = new ChessMove(pos, new ChessPosition(r+1, r-1), toPromote);
-                moves.add(toAdd);
-            }
+            promotions(moves, pos, r,c+1, 8);
         }
-        if(move1 == null) {
-            for(PieceType toPromote : bigBoys){
-                ChessMove toAdd = new ChessMove(pos, new ChessPosition(r+1, r-1), toPromote);
+    }
+
+    //backrank white == 8
+
+    private void promotions(ArrayList<ChessMove> moves, ChessPosition pos, int r, int c, int backRank){
+
+        PieceType [] bigBoys = {PieceType.BISHOP, PieceType.ROOK, PieceType.KNIGHT, PieceType.QUEEN};
+        if(r+1 == backRank) {
+            for (PieceType toPromote : bigBoys) {
+                ChessMove toAdd = new ChessMove(pos, new ChessPosition(r+1, c), toPromote);
                 moves.add(toAdd);
             }
+        }else{
+            ChessMove toAdd = new ChessMove(pos, new ChessPosition(r+1,c), null);
+            moves.add(toAdd);
         }
     }
 
