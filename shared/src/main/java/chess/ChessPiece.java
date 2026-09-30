@@ -1,11 +1,9 @@
 package chess;
 
-import java.util.ArrayList;
+
 import java.util.Collection;
 import java.util.Objects;
-
-
-
+import java.util.ArrayList;
 /**
  * Represents a single chess piece
  * <p>
@@ -13,13 +11,11 @@ import java.util.Objects;
  * signature of the existing methods.
  */
 public class ChessPiece {
-    private final ChessGame.TeamColor pieceColor;
-    private final PieceType type;
 
-    public ChessPiece(ChessGame.TeamColor pieceColor, ChessPiece.PieceType type) {
-        this.pieceColor = pieceColor;
-        this.type = type;
-    }
+
+    private ChessGame.TeamColor pieceColor;
+    private ChessPiece.PieceType type;
+
 
     @Override
     public boolean equals(Object o) {
@@ -30,18 +26,18 @@ public class ChessPiece {
         return pieceColor == that.pieceColor && type == that.type;
     }
 
+
     @Override
     public int hashCode() {
         return Objects.hash(pieceColor, type);
     }
 
-    @Override
-    public String toString() {
-        if(pieceColor == ChessGame.TeamColor.BLACK){
-            return "B" + type;
-        }
-        return "" + type;
+
+    public ChessPiece(ChessGame.TeamColor pieceColor, ChessPiece.PieceType type) {
+        this.pieceColor = pieceColor;
+        this.type = type;
     }
+
 
     /**
      * The various different chess piece options
@@ -55,21 +51,22 @@ public class ChessPiece {
         PAWN
     }
 
+
     /**
      * @return Which team this chess piece belongs to
      */
     public ChessGame.TeamColor getTeamColor() {
         return this.pieceColor;
-        //throw new RuntimeException("Not implemented");
     }
+
 
     /**
      * @return which type of chess piece this piece is
      */
     public PieceType getPieceType() {
         return this.type;
-        //throw new RuntimeException("Not implemented");
     }
+
 
     /**
      * Calculates all the positions a chess piece can move to
@@ -77,162 +74,173 @@ public class ChessPiece {
      * danger
      *
      * @return Collection of valid moves
-     * Will return an ArrayList full of valid moves (coord (r,c)) for specific piece
-     * numbers.add(new int[]{3, 5});
      */
-    public Collection<ChessMove> pieceMoves(ChessBoard board, ChessPosition myPosition){
-        ChessGame.TeamColor enemyColor = (this.pieceColor == ChessGame.TeamColor.BLACK) ? ChessGame.TeamColor.WHITE : ChessGame.TeamColor.BLACK;
-        ArrayList<ChessMove> moves = new ArrayList<>();
+    public Collection<ChessMove> pieceMoves(ChessBoard board, ChessPosition myPosition) {
+        int r = myPosition.getRow();
+        int c = myPosition.getColumn();
+
+
+        ArrayList <ChessMove> moves = new ArrayList<>();
+        ChessGame.TeamColor enemyColor = (this.getTeamColor() == ChessGame.TeamColor.BLACK) ? ChessGame.TeamColor.WHITE : ChessGame.TeamColor.BLACK;
+
+
         switch(this.type){
-            case KING:
-                king_move(board,moves, myPosition, enemyColor);
+            case PieceType.KING:
+                int [][] kingMoves = {{r+1,c-1},{r+1,c},{r+1,c+1},{r,c+1},{r-1,c+1},{r-1,c},{r-1,c-1},{r,c-1}};
+                getValid(moves,board,myPosition,enemyColor,kingMoves);
                 break;
-            case QUEEN:
-                int [][] qDir = {{1,0},{0,1},{-1,0},{0,-1},{1,1},{-1,1},{-1,-1},{1,-1}};
-                for(int [] coord : qDir) getMovesInDirection(moves, board, myPosition, coord[0],coord[1], enemyColor); //N Direction
+            case PieceType.QUEEN:
+                int [][] qDir = {{1,0},{0,1},{-1,0},{0,-1},{1,1},{1,-1},{-1,1},{-1,-1}};
+                for (int [] dir : qDir) getDir(moves,board,myPosition,enemyColor,dir);
                 break;
-            case ROOK:
-                int [][] rDir = {{1,0},{0,1},{-1,0},{0,-1}};
-                for(int[] coord : rDir) getMovesInDirection(moves, board, myPosition, coord[0],coord[1], enemyColor);
+            case PieceType.BISHOP:
+                int [][] bDir = {{1,1},{1,-1},{-1,1},{-1,-1}};
+                for (int [] dir : bDir) getDir(moves,board,myPosition,enemyColor,dir);
                 break;
-            case BISHOP:
-                int [][] bDir = {{1,1},{-1,1},{-1,-1},{1,-1}};
-                for(int[] coord : bDir) getMovesInDirection(moves, board, myPosition, coord[0],coord[1], enemyColor);
+            case PieceType.ROOK:
+                int [][] rDir = {{1,0},{-1,0},{0,1},{0,-1}};
+                for (int [] dir : rDir) getDir(moves,board,myPosition,enemyColor,dir);
                 break;
-            case KNIGHT:
-                knight_move(board, moves, myPosition, enemyColor);
+            case PieceType.KNIGHT:
+                int [][] kMoves = {{r+2,c-1},{r+2,c+1},{r-1,c+2},{r+1,c+2},{r-2,c-1},{r-2,c+1},{r-1,c-2},{r+1,c-2}};
+                getValid(moves,board,myPosition,enemyColor,kMoves);
                 break;
-            case PAWN:
-                if(this.pieceColor == ChessGame.TeamColor.WHITE){
-                    pawnMoveWhite(board,moves,myPosition, enemyColor);
-                }else {
-                    pawnMoveBlack(board, moves, myPosition, enemyColor);
+            case PieceType.PAWN:
+                if(this.getTeamColor() == ChessGame.TeamColor.WHITE){
+                    pawnWhite(moves,board,myPosition,enemyColor);
+                }else{
+                    pawnBlack(moves,board,myPosition,enemyColor);
                 }
                 break;
         }
         return moves;
     }
-    private void pawnMoveBlack(ChessBoard board, ArrayList<ChessMove> moves, ChessPosition pos, ChessGame.TeamColor enemyColor){
+
+
+    private void pawnBlack(ArrayList<ChessMove> moves, ChessBoard board, ChessPosition pos, ChessGame.TeamColor enemyColor){
         int r = pos.getRow();
         int c = pos.getColumn();
-        //to check possible move squares if there is a piece to capture or your own piece in the way
-        ChessPiece captureR = (c-1 == 0) ? null : board.getPiece(new ChessPosition(r-1,c-1));
-        System.out.println("r: " + (r-1) + " c: " + (c-1));
-        ChessPiece captureL = (c+1 == 9) ? null : board.getPiece(new ChessPosition(r-1, c+1));
-        ChessPiece move1 = board.getPiece(new ChessPosition(r-1, c));
 
-        if(move1 == null) {
-            promotions(moves, pos, r, c, 1,-1);
-        }
+
+        ChessPiece capL = (c == 8) ? null : board.getPiece(new ChessPosition(r-1,c+1));
+        ChessPiece capR = (c == 1) ? null : board.getPiece(new ChessPosition(r-1,c-1));
+
+
+
+
         //move2
-        if(r == 7 && board.getPiece(new ChessPosition(r-1, c)) == null){
-            if(board.getPiece(new ChessPosition(r-2, c)) == null){
-                moves.add(new ChessMove(pos, new ChessPosition(r-2, c), null));
+        if(r == 7 && board.getPiece(new ChessPosition(r-1,c)) == null){
+            if(board.getPiece(new ChessPosition(r-2,c)) == null){
+                moves.add(new ChessMove(pos, new ChessPosition(r-2,c),null));
             }
         }
-        if(captureR != null && captureR.getTeamColor() == enemyColor){
-            promotions(moves, pos, r, c-1,1,-1);
+
+
+        //move1
+        if(board.getPiece(new ChessPosition(r-1,c)) == null){
+            promotions(moves, pos, r-1,c, 1);
         }
-        if(captureL != null && captureL.getTeamColor() == enemyColor){
-            promotions(moves, pos, r,c+1,1,-1);
+        if(capL != null && capL.getTeamColor() == enemyColor){
+            promotions(moves, pos, r-1,c+1, 1);
+        }
+        if(capR != null && capR.getTeamColor() == enemyColor){
+            promotions(moves, pos, r-1,c-1, 1);
         }
     }
 
-    private void pawnMoveWhite(ChessBoard board, ArrayList<ChessMove> moves, ChessPosition pos, ChessGame.TeamColor enemyColor){
+
+    private void pawnWhite(ArrayList<ChessMove> moves, ChessBoard board, ChessPosition pos, ChessGame.TeamColor enemyColor){
         int r = pos.getRow();
         int c = pos.getColumn();
-        //to check possible move squares if there is a piece to capture or your own piece in the way
-        ChessPiece captureL = (c-1 == 0) ? null : board.getPiece(new ChessPosition(r+1,c-1));
-        ChessPiece captureR = (c+1 == 9) ? null : board.getPiece(new ChessPosition(r+1, c+1));
-        ChessPiece move1 = board.getPiece(new ChessPosition(r+1, c));
 
-        if(move1 == null) {
-            promotions(moves, pos, r, c,8,1);
-        }
+
+        ChessPiece capL = (c == 1) ? null : board.getPiece(new ChessPosition(r+1,c-1));
+        ChessPiece capR = (c == 8) ? null : board.getPiece(new ChessPosition(r+1,c+1));
+
+
         //move2
-        if(r == 2 && board.getPiece(new ChessPosition(r+1, c)) == null){
-            if(board.getPiece(new ChessPosition(r+2, c)) == null){
-                moves.add(new ChessMove(pos, new ChessPosition(r+2, c), null));
+        if(r == 2 && board.getPiece(new ChessPosition(r+1,c)) == null){
+            if(board.getPiece(new ChessPosition(r+2,c)) == null){
+                moves.add(new ChessMove(pos, new ChessPosition(r+2,c),null));
             }
         }
-        if(captureL != null && captureL.getTeamColor() == enemyColor){
-            promotions(moves, pos, r, c-1, 8,1);
+
+
+        //move1
+        if(board.getPiece(new ChessPosition(r+1,c)) == null){
+            promotions(moves, pos, r+1,c, 8);
         }
-        if(captureR != null && captureR.getTeamColor() == enemyColor){
-            promotions(moves, pos, r,c+1, 8,1);
+        if(capL != null && capL.getTeamColor() == enemyColor){
+            promotions(moves, pos, r+1,c-1, 8);
+        }
+        if(capR != null && capR.getTeamColor() == enemyColor){
+            promotions(moves, pos, r+1,c+1, 8);
         }
     }
 
-    //backRank white == 8, backRank black == 1
 
-    private void promotions(ArrayList<ChessMove> moves, ChessPosition pos, int r, int c, int backRank, int dir){
-
-        PieceType [] bigBoys = {PieceType.BISHOP, PieceType.ROOK, PieceType.KNIGHT, PieceType.QUEEN};
-        if(r+dir == backRank) {
-            for (PieceType toPromote : bigBoys) {
-                ChessMove toAdd = new ChessMove(pos, new ChessPosition(r+dir, c), toPromote);
-                moves.add(toAdd);
+    private void promotions(ArrayList<ChessMove> moves, ChessPosition pos, int r, int c, int backRank){
+        ChessPiece.PieceType [] bigBoys = {ChessPiece.PieceType.ROOK, ChessPiece.PieceType.QUEEN, ChessPiece.PieceType.KNIGHT, ChessPiece.PieceType.BISHOP};
+        if(r == backRank) {
+            for (ChessPiece.PieceType promote: bigBoys) {
+                moves.add(new ChessMove(pos, new ChessPosition(r, c), promote));
             }
-        }else{
-            ChessMove toAdd = new ChessMove(pos, new ChessPosition(r+dir,c), null);
-            moves.add(toAdd);
+        }else {
+            moves.add(new ChessMove(pos, new ChessPosition(r, c), null));
         }
     }
 
-    private void knight_move(ChessBoard board, ArrayList<ChessMove> moves, ChessPosition pos, ChessGame.TeamColor enemyColor){
-        int r = pos.getRow();
-        int c = pos.getColumn();
-        int [][] possibleMoves = {{r+2,c-1},{r+2,c+1}, {r+1,c+2},{r-1,c+2}, {r-2,c+1},{r-2,c-1}, {r-1,c-2},{r+1,c-2}};
-        get_valid_moves(board, possibleMoves, moves, enemyColor, pos);
-    }
 
-    private void king_move(ChessBoard board, ArrayList<ChessMove> moves, ChessPosition pos,ChessGame.TeamColor enemyColor){
-        int r = pos.getRow();
-        int c = pos.getColumn();
-        int [][] possibleMoves = {{r+1,c-1}, {r+1,c},{r+1,c+1},{r,c+1},{r-1,c+1},{r-1,c},{r-1,c-1},{r,c-1}};
-        get_valid_moves(board,possibleMoves, moves, enemyColor, pos);
-    }
+    private void getValid(ArrayList<ChessMove> moves, ChessBoard board, ChessPosition pos, ChessGame.TeamColor enemyColor, int [][] possible){
 
 
-    // abstracted method to use for knight, pawn, king with one set of moves, not continuous
-    private void get_valid_moves(ChessBoard board, int[][] possibleMoves, ArrayList<ChessMove> moves, ChessGame.TeamColor enemyColor, ChessPosition pos){
-        for(int i = 0; i < possibleMoves.length; i++){
-            if((possibleMoves[i][0] <= 0) || (possibleMoves[i][0] > 8))continue; //rejects all off board moves
-            if((possibleMoves[i][1] <= 0) || (possibleMoves[i][1] > 8))continue;
-            ChessPosition check = new ChessPosition(possibleMoves[i][0], possibleMoves[i][1]);
-            if(board.getPiece(check) != null){ //checks if there is a piece on a square
-                if (board.getPiece(check).pieceColor == enemyColor){ //checks if that piece is an enemy piece
-                    moves.add(new ChessMove(pos, check, null));
+        for(int [] move : possible){
+            if(move[0] <= 0 || move[0] >= 9)continue;
+            if(move[1] <= 0 || move[1] >= 9)continue;
+
+
+            ChessPosition toMove = new ChessPosition(move[0], move[1]);
+            if(board.getPiece(toMove) != null){
+                if(board.getPiece(toMove).getTeamColor() == enemyColor){
+                    moves.add(new ChessMove(pos, toMove, null));
                 }
             }else{
-                moves.add(new ChessMove(pos, check, null));
+                moves.add(new ChessMove(pos, toMove, null));
             }
         }
     }
 
-    private void getMovesInDirection(ArrayList<ChessMove> moves, ChessBoard board, ChessPosition pos, int rDir, int cDir, ChessGame.TeamColor enemyColor){
+
+    private void getDir (ArrayList<ChessMove> moves, ChessBoard board, ChessPosition pos, ChessGame.TeamColor enemyColor, int [] dir){
         int r = pos.getRow();
         int c = pos.getColumn();
 
-        int vertBound = 0; //make into query, eliminate the if statements
-        int horBound = 0;
-        if (rDir > 0)vertBound = 9;
-        if(cDir > 0)horBound = 9;
 
-        while(true) {
-            if ((r+rDir == vertBound) || (c+cDir == horBound)) {
+        int vB = (dir[0] > 0) ? 9 : 0;
+        int hB = (dir[1] > 0) ? 9 : 0;
+
+
+        while(true){
+            if(r+dir[0] == vB || c+dir[1] == hB){
                 break;
+            }
 
-            } else if (board.getPiece(new ChessPosition(r+rDir, c+cDir)) != null) {
-                if (board.getPiece(new ChessPosition(r+rDir, c+cDir)).pieceColor == enemyColor) {
-                    moves.add(new ChessMove(pos, new ChessPosition(r+rDir, c+cDir), null));
+
+            ChessPosition toMove = new ChessPosition(r+dir[0], c+dir[1]);
+            if(board.getPiece(toMove) != null){
+                if(board.getPiece(toMove).getTeamColor() == enemyColor){
+                    moves.add(new ChessMove(pos,toMove,null));
                 }
                 break;
-            } else {
-                moves.add(new ChessMove(pos, new ChessPosition(r+rDir, c+cDir), null));
             }
-            r+=rDir;
-            c+=cDir;
+            moves.add(new ChessMove(pos,toMove,null));
+            r+=dir[0];
+            c+=dir[1];
+
+
         }
     }
+
+
 }
+

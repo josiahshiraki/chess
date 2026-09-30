@@ -1,6 +1,7 @@
 package chess;
 
 import java.util.Collection;
+import java.util.ArrayList;
 
 /**
  * A class that can manage a chess game, making moves on a board
@@ -10,15 +11,21 @@ import java.util.Collection;
  */
 public class ChessGame {
 
-    public ChessGame() {
+    private TeamColor teamTurn;
+    private ChessBoard board;
 
+
+    public ChessGame() {
+        this.teamTurn = TeamColor.WHITE;
+        this.board = new ChessBoard();
+        this.board.resetBoard();
     }
 
     /**
      * @return Which team's turn it is
      */
     public TeamColor getTeamTurn() {
-        throw new RuntimeException("Not implemented");
+        return this.teamTurn;
     }
 
     /**
@@ -27,7 +34,7 @@ public class ChessGame {
      * @param team the team whose turn it is
      */
     public void setTeamTurn(TeamColor team) {
-        throw new RuntimeException("Not implemented");
+        this.teamTurn = team;
     }
 
     /**
@@ -56,7 +63,9 @@ public class ChessGame {
      * @throws InvalidMoveException if move is invalid
      */
     public void makeMove(ChessMove move) throws InvalidMoveException {
-        throw new RuntimeException("Not implemented");
+        ChessPiece pieceToMove = board.getPiece(move.getStartPosition());
+        this.board.addPiece(move.getEndPosition(), pieceToMove); //set piece to its new position
+        this.board.addPiece(move.getStartPosition(), null); //remove object from original position
     }
 
     /**
@@ -66,7 +75,23 @@ public class ChessGame {
      * @return True if the specified team is in check
      */
     public boolean isInCheck(TeamColor teamColor) {
-        throw new RuntimeException("Not implemented");
+        TeamColor enemy = (teamColor == TeamColor.BLACK) ? TeamColor.WHITE : TeamColor.BLACK;
+        ArrayList <ChessPosition> enemyPieces = scanForEnemy(enemy);
+
+        return false;
+    }
+
+    private ArrayList<ChessPosition> scanForEnemy(TeamColor enemy){
+        ArrayList <ChessPosition> enemyPieces = new ArrayList<>();
+        for(int r = 0; r < 8; r++){
+            for(int c = 0; c < 8; c++){
+                ChessPiece toCheck = this.board.getPiece(new ChessPosition(r+1,c+1));
+                if(toCheck.getTeamColor() == enemy){
+                    enemyPieces.add(new ChessPosition(r+1,c+1));
+                }
+            }
+        }
+        return enemyPieces;
     }
 
     /**
