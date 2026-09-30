@@ -78,7 +78,31 @@ public class ChessGame {
         TeamColor enemy = (teamColor == TeamColor.BLACK) ? TeamColor.WHITE : TeamColor.BLACK;
         ArrayList <ChessPosition> enemyPieces = scanForEnemy(enemy);
 
+        for(ChessPosition check : enemyPieces){
+            ChessPiece enemyPiece = board.getPiece(check);
+            Collection <ChessMove> moves = enemyPiece.pieceMoves(board, check);
+            ChessPosition kingPos = findKing(teamColor);
+            for(ChessMove move : moves){
+                ChessPosition threat = move.getEndPosition();
+                if(kingPos == threat) {
+                    return true;
+                }
+            }
+        }
         return false;
+    }
+
+    private ChessPosition findKing(TeamColor teamColor){
+        for(int r = 0; r < 8; r++){
+            for(int c = 0; c < 8; c++){
+                if(this.board.getPiece(new ChessPosition(r+1,c+1)).getPieceType() == ChessPiece.PieceType.KING){
+                    if(this.board.getPiece(new ChessPosition(r+1,c+1)).getTeamColor() == teamColor) {
+                        return new ChessPosition(r + 1, c + 1);
+                    }
+                }
+            }
+        }
+        return null;
     }
 
     private ArrayList<ChessPosition> scanForEnemy(TeamColor enemy){
@@ -101,7 +125,7 @@ public class ChessGame {
      * @return True if the specified team is in checkmate
      */
     public boolean isInCheckmate(TeamColor teamColor) {
-        throw new RuntimeException("Not implemented");
+        return isInCheck(teamColor);
     }
 
     /**
