@@ -65,6 +65,7 @@ public class ChessGame {
     }
 
     //method to check ONE SINGLE move to see if moving that piece will put the king in check
+    //returns a boolean that indicates weather that move puts teamColor King in check
     private boolean simulateBoard(ChessMove check, TeamColor teamColor){
         ChessBoard simulate = copyBoard();
 
@@ -79,7 +80,7 @@ public class ChessGame {
     //has to simulate a board so we don't mutate the actual game board which could lead to problems
     public boolean isInCheckSim(TeamColor teamColor, ChessBoard simulate) {
         TeamColor enemy = (teamColor == TeamColor.BLACK) ? TeamColor.WHITE : TeamColor.BLACK;
-        ArrayList <ChessPosition> enemyPieces = scanForEnemy(enemy);
+        ArrayList <ChessPosition> enemyPieces = scanForPieces(enemy);
         ChessPosition kingPos = findKing(teamColor);
         assert kingPos != null;
 
@@ -136,7 +137,7 @@ public class ChessGame {
      */
     public boolean isInCheck(TeamColor teamColor) {
         TeamColor enemy = (teamColor == TeamColor.BLACK) ? TeamColor.WHITE : TeamColor.BLACK;
-        ArrayList <ChessPosition> enemyPieces = scanForEnemy(enemy);
+        ArrayList <ChessPosition> enemyPieces = scanForPieces(enemy);
         ChessPosition kingPos = findKing(teamColor);
         assert kingPos != null;
 
@@ -189,7 +190,8 @@ public class ChessGame {
         return null;
     }
 
-    private ArrayList<ChessPosition> scanForEnemy(TeamColor enemy){
+    //scans for pieces of a given color
+    private ArrayList<ChessPosition> scanForPieces(TeamColor enemy){
         ArrayList <ChessPosition> enemyPieces = new ArrayList<>();
         for(int r = 0; r < 8; r++){
             for(int c = 0; c < 8; c++){
@@ -209,7 +211,18 @@ public class ChessGame {
      * @return True if the specified team is in checkmate
      */
     public boolean isInCheckmate(TeamColor teamColor){
-        return isInCheck(teamColor);
+        if (!isInCheck(teamColor))return false;
+        ChessPosition kingPos = findKing(teamColor);
+
+        //have to check if an ally piece can block a check -> simulate every ally piece
+        for (ChessPosition ally : scanForPieces(teamColor)){
+            for (ChessMove check : validMoves(ally)){
+                if(!simulateBoard(check, teamColor)) return false;
+            }
+        }
+
+        //if the king is in check, and he has no valid moves left then the game is over, enemy has checkmated you XD
+        return validMoves(kingPos).isEmpty();
     }
 
     /**
@@ -220,7 +233,13 @@ public class ChessGame {
      * @return True if the specified team is in stalemate, otherwise false
      */
     public boolean isInStalemate(TeamColor teamColor) {
-        throw new RuntimeException("Not implemented");
+        if(!isInCheckmate(teamColor)) return false; //if in checkmate, not in stalemate
+        for (ChessPosition ally : scanForPieces(teamColor)){
+            if(!validMoves(ally).isEmpty()) return false;
+        }
+
+        //returns true if no pieces (including the king) have no valid moves
+        return true;
     }
 
     /**
