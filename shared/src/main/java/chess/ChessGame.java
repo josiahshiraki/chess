@@ -47,13 +47,67 @@ public class ChessGame {
 
     /**
      * Gets all valid moves for a piece at the given location
+     * Use arraylists function .remove(a) to remove 1
      *
      * @param startPosition the piece to get valid moves for
      * @return Set of valid moves for requested piece, or null if no piece at
      * startPosition
      */
     public Collection<ChessMove> validMoves(ChessPosition startPosition) {
-        throw new RuntimeException("Not implemented");
+        ChessPiece piece = board.getPiece(startPosition);
+        if(piece == null)return null;
+        Collection <ChessMove> valid = piece.pieceMoves(board,startPosition);
+
+        // set a list that saves all danger moves that would move a king into danger
+        // if a piece is pinned? ->
+
+        valid.removeIf(check -> simulateBoard(check, piece.getTeamColor()));
+
+        return valid;
+    }
+
+    //method to check ONE SINGLE move to see if moving that piece will put the king in check
+    private boolean simulateBoard(ChessMove check, TeamColor teamColor){
+        ChessBoard simulate = copyBoard();
+
+        //simulates a move
+        ChessPiece pieceToMove = simulate.getPiece(check.getStartPosition());
+        simulate.addPiece(check.getEndPosition(), pieceToMove); //set piece to its new position
+        simulate.addPiece(check.getStartPosition(), null); //remove object from original position
+
+        return isInCheckSim(teamColor, simulate);
+
+    }
+
+    public boolean isInCheckSim(TeamColor teamColor, ChessBoard simulate) {
+        TeamColor enemy = (teamColor == TeamColor.BLACK) ? TeamColor.WHITE : TeamColor.BLACK;
+        ArrayList <ChessPosition> enemyPieces = scanForEnemy(enemy);
+
+        for(ChessPosition check : enemyPieces){
+            ChessPiece enemyPiece = simulate.getPiece(check);
+            Collection <ChessMove> moves = enemyPiece.pieceMoves(simulate, check);
+            ChessPosition kingPos = findKing(teamColor);
+            for(ChessMove move : moves){
+                ChessPosition threat = move.getEndPosition();
+                if(kingPos == threat) {
+                    return true;
+                }
+            }
+        }
+        return false;
+    }
+
+    private ChessBoard copyBoard(){
+        ChessBoard simulate = new ChessBoard();
+        for(int r = 0; r < 8; r++){
+            for(int c = 0; c < 8; c++){
+                ChessPiece toAdd = board.getPiece(new ChessPosition(r+1,c+1));
+                if(toAdd != null){
+                    simulate.addPiece(new ChessPosition(r+1,c+1), toAdd);
+                }
+            }
+        }
+        return simulate;
     }
 
     /**
@@ -81,6 +135,12 @@ public class ChessGame {
         for(ChessPosition check : enemyPieces){
             ChessPiece enemyPiece = board.getPiece(check);
             Collection <ChessMove> moves = enemyPiece.pieceMoves(board, check);
+            if(enemyPiece.getPieceType() == ChessPiece.PieceType.PAWN){
+                if(pawnThreat()){
+                    return true;
+                }
+                continue;
+            }
             ChessPosition kingPos = findKing(teamColor);
             for(ChessMove move : moves){
                 ChessPosition threat = move.getEndPosition();
@@ -89,6 +149,12 @@ public class ChessGame {
                 }
             }
         }
+        return false;
+    }
+
+    private boolean pawnThreat(){
+        //because piece moves will only say possible moves if a piece is in a capture zone, you need to check these instead
+        //of the moves that it can already do, a king can move in front of pawn, but not it's immediate diagonal
         return false;
     }
 
@@ -124,7 +190,7 @@ public class ChessGame {
      * @param teamColor which team to check for checkmate
      * @return True if the specified team is in checkmate
      */
-    public boolean isInCheckmate(TeamColor teamColor) {
+    public boolean isInCheckmate(TeamColor teamColor){
         return isInCheck(teamColor);
     }
 
@@ -145,7 +211,7 @@ public class ChessGame {
      * @param board the new board to use
      */
     public void setBoard(ChessBoard board) {
-        throw new RuntimeException("Not implemented");
+        this.board = board;
     }
 
     /**
@@ -154,6 +220,6 @@ public class ChessGame {
      * @return the chessboard
      */
     public ChessBoard getBoard() {
-        throw new RuntimeException("Not implemented");
+        return this.board;
     }
 }
