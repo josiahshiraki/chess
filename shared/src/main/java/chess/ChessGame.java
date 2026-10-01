@@ -58,9 +58,7 @@ public class ChessGame {
         if(piece == null)return null;
         Collection <ChessMove> valid = piece.pieceMoves(board,startPosition);
 
-        // set a list that saves all danger moves that would move a king into danger
         // if a piece is pinned? ->
-
         valid.removeIf(check -> simulateBoard(check, piece.getTeamColor()));
 
         return valid;
@@ -76,20 +74,27 @@ public class ChessGame {
         simulate.addPiece(check.getStartPosition(), null); //remove object from original position
 
         return isInCheckSim(teamColor, simulate);
-
     }
 
+    //has to simulate a board so we don't mutate the actual game board which could lead to problems
     public boolean isInCheckSim(TeamColor teamColor, ChessBoard simulate) {
         TeamColor enemy = (teamColor == TeamColor.BLACK) ? TeamColor.WHITE : TeamColor.BLACK;
         ArrayList <ChessPosition> enemyPieces = scanForEnemy(enemy);
+        ChessPosition kingPos = findKing(teamColor);
+        assert kingPos != null;
 
         for(ChessPosition check : enemyPieces){
             ChessPiece enemyPiece = simulate.getPiece(check);
+
+            if(enemyPiece.getPieceType() == ChessPiece.PieceType.PAWN){
+                if(pawnThreat(check, kingPos, teamColor)) return true;
+                continue;
+            }
+
             Collection <ChessMove> moves = enemyPiece.pieceMoves(simulate, check);
-            ChessPosition kingPos = findKing(teamColor);
             for(ChessMove move : moves){
                 ChessPosition threat = move.getEndPosition();
-                if(kingPos == threat) {
+                if(kingPos.equals(threat)) {
                     return true;
                 }
             }
@@ -124,6 +129,7 @@ public class ChessGame {
 
     /**
      * Determines if the given team is in check
+     * if you change this method make sure to change the simulation isInCheck method too :)
      *
      * @param teamColor which team to check for check
      * @return True if the specified team is in check
@@ -131,20 +137,21 @@ public class ChessGame {
     public boolean isInCheck(TeamColor teamColor) {
         TeamColor enemy = (teamColor == TeamColor.BLACK) ? TeamColor.WHITE : TeamColor.BLACK;
         ArrayList <ChessPosition> enemyPieces = scanForEnemy(enemy);
+        ChessPosition kingPos = findKing(teamColor);
+        assert kingPos != null;
 
         for(ChessPosition check : enemyPieces){
             ChessPiece enemyPiece = board.getPiece(check);
-            Collection <ChessMove> moves = enemyPiece.pieceMoves(board, check);
+
             if(enemyPiece.getPieceType() == ChessPiece.PieceType.PAWN){
-                if(pawnThreat()){
-                    return true;
-                }
+                if(pawnThreat(check, kingPos, teamColor)) return true;
                 continue;
             }
-            ChessPosition kingPos = findKing(teamColor);
+
+            Collection <ChessMove> moves = enemyPiece.pieceMoves(board, check);
             for(ChessMove move : moves){
                 ChessPosition threat = move.getEndPosition();
-                if(kingPos == threat) {
+                if(kingPos.equals(threat)) {
                     return true;
                 }
             }
@@ -152,10 +159,21 @@ public class ChessGame {
         return false;
     }
 
-    private boolean pawnThreat(){
-        //because piece moves will only say possible moves if a piece is in a capture zone, you need to check these instead
-        //of the moves that it can already do, a king can move in front of pawn, but not it's immediate diagonal
-        return false;
+    //returns true if a pawn is threatening check
+    private boolean pawnThreat(ChessPosition pawnPos, ChessPosition kingPos, TeamColor pawnC){
+        //check pawns immediate diagonals instead of front moves because pieceMoves only returns a diagonal if a enemy piece is there
+        int r = pawnPos.getRow();
+        int c = pawnPos.getColumn();
+        int advance = (pawnC == TeamColor.WHITE) ? 1 : -1;
+
+        ChessPosition checkL = new ChessPosition(r+advance, c+1);
+        ChessPosition checkR = new ChessPosition(r+advance, c-1);
+
+        if(checkL.equals(kingPos)){
+            return true;
+        }else{
+            return checkR.equals(kingPos);
+        }
     }
 
     private ChessPosition findKing(TeamColor teamColor){
