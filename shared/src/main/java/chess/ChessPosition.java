@@ -52,9 +52,9 @@ public class ChessPosition {
 
     @Override
     public String toString() {
-        return "ChessPosition{" +
-                "row=" + row +
-                ", col=" + col +
-                '}';
+        return "ChessPosition[" +
+                "r:" + row +
+                " c:" + col +
+                ']';
     }
 }
