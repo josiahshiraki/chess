@@ -72,11 +72,11 @@ public class ChessGame {
         if(piece == null){
             return null;
         }
-        Collection <ChessMove> valid = new ArrayList<>();
+        Collection <ChessMove> valid = piece.pieceMoves(board,startPosition);;
         if (isInCheck(piece.getTeamColor()) && (piece.getPieceType() != ChessPiece.PieceType.KING)){
+            valid.removeIf(check -> simulateBoard(check, piece.getTeamColor()));
             return valid;
         }
-        valid = piece.pieceMoves(board,startPosition);
         //I think if a knight is pinned, it cannot move in any direction so we would only have to check once
         // if a piece is pinned in specific direction? -> the resulting move check will put the king in check, so we remove from valid
         valid.removeIf(check -> simulateBoard(check, piece.getTeamColor()));
@@ -293,7 +293,7 @@ public class ChessGame {
      * @return True if the specified team is in stalemate, otherwise false
      */
     public boolean isInStalemate(TeamColor teamColor) {
-        if(!isInCheckmate(teamColor)) return false; //if in checkmate, not in stalemate
+        if(isInCheckmate(teamColor)) return false; //if in checkmate, not in stalemate
         for (ChessPosition ally : scanForPieces(teamColor)){
             if(!validMoves(ally).isEmpty()) return false;
         }
