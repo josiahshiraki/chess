@@ -69,13 +69,10 @@ public class ChessGame {
      */
     public Collection<ChessMove> validMoves(ChessPosition startPosition) {
         ChessPiece piece = board.getPiece(startPosition);
-        if(piece == null){
-            return null;
-        }
+        if(piece == null) return null;
         Collection <ChessMove> valid = piece.pieceMoves(board,startPosition);
-        valid.removeIf(check -> simulateBoard(check, piece.getTeamColor()));
 
-        if (isInCheck(piece.getTeamColor()) && (piece.getPieceType() != ChessPiece.PieceType.KING)) return valid;
+        valid.removeIf(check -> simulateBoard(check, piece.getTeamColor()));
 
         // if a piece is pinned in specific direction? -> the resulting move check will put the king in check, so we remove from valid
         return valid;
@@ -120,6 +117,21 @@ public class ChessGame {
         return false;
     }
 
+    private ChessPosition findKingSim(TeamColor teamColor, ChessBoard simulate){
+        for(int r = 0; r < 8; r++){
+            for(int c = 0; c < 8; c++){
+                ChessPiece piece = simulate.getPiece(new ChessPosition(r+1,c+1));
+                if(piece == null) continue;
+                if(piece.getPieceType() == ChessPiece.PieceType.KING){
+                    if(piece.getTeamColor() == teamColor) {
+                        return new ChessPosition(r + 1, c + 1);
+                    }
+                }
+            }
+        }
+        return null;
+    }
+
     private ChessBoard copyBoard(){
         ChessBoard simulate = new ChessBoard();
         for(int r = 0; r < 8; r++){
@@ -142,10 +154,9 @@ public class ChessGame {
     public void makeMove(ChessMove move) throws InvalidMoveException {
         ChessPosition start = move.getStartPosition();
         ChessPiece pieceToMove = board.getPiece(move.getStartPosition());
-
         if(move.getPromotionPiece() != null) pieceToMove = new ChessPiece(teamTurn, move.getPromotionPiece());
-        if(pieceToMove == null )throw new InvalidMoveException("Moved no Piece");
 
+        if(pieceToMove == null) throw new InvalidMoveException("Moved no Piece");
 
         // THROW ERRORS
         Collection <ChessMove> valid = validMoves(start);
@@ -171,7 +182,9 @@ public class ChessGame {
         TeamColor enemy = (teamColor == TeamColor.BLACK) ? TeamColor.WHITE : TeamColor.BLACK;
         ChessPosition kingPos = findKing(teamColor);
         assert kingPos != null;
+
         ArrayList <ChessPosition> enemies = scanForPieces(enemy);
+
         for(ChessPosition check : enemies){
             ChessPiece enemyPiece = board.getPiece(check);
 
@@ -204,20 +217,6 @@ public class ChessGame {
         }
     }
 
-    private ChessPosition findKingSim(TeamColor teamColor, ChessBoard simulate){
-        for(int r = 0; r < 8; r++){
-            for(int c = 0; c < 8; c++){
-                ChessPiece piece = simulate.getPiece(new ChessPosition(r+1,c+1));
-                if(piece == null) continue;
-                if(piece.getPieceType() == ChessPiece.PieceType.KING){
-                    if(piece.getTeamColor() == teamColor) {
-                        return new ChessPosition(r + 1, c + 1);
-                    }
-                }
-            }
-        }
-        return null;
-    }
 
     private ChessPosition findKing(TeamColor teamColor){
         for(int r = 0; r < 8; r++){
@@ -256,15 +255,14 @@ public class ChessGame {
      * @return True if the specified team is in checkmate
      */
     public boolean isInCheckmate(TeamColor teamColor){
-        if (!isInCheck(teamColor))return false;
+        if (!isInCheck(teamColor)) return false;
         ChessPosition kingPos = findKing(teamColor);
 
         //have to check if an Ally piece can block a check -> simulate every ally piece
         for (ChessPosition ally : scanForPieces(teamColor)){
-            for (ChessMove check : validMoves(ally)){
-                if(!simulateBoard(check, teamColor)) return false;
-            }
+            for (ChessMove check : validMoves(ally)) if(!simulateBoard(check, teamColor)) return false;
         }
+
         //if the king is in check, and he has no valid moves left then the game is over, enemy has checkmated you XD
         return validMoves(kingPos).isEmpty();
     }
@@ -278,9 +276,9 @@ public class ChessGame {
      */
     public boolean isInStalemate(TeamColor teamColor) {
         if(isInCheckmate(teamColor)) return false; //if in checkmate, not in stalemate
-        for (ChessPosition ally : scanForPieces(teamColor)){
-            if(!validMoves(ally).isEmpty()) return false;
-        }
+
+        for (ChessPosition ally : scanForPieces(teamColor)) if(!validMoves(ally).isEmpty()) return false;
+
         //returns true if no pieces (including the king) has no valid moves
         return true;
     }
