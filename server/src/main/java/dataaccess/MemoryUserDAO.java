@@ -24,4 +24,5 @@ public class MemoryUserDAO implements UserDAO {
     public UserData getUser(String username) {
         return users.get(username);
     }
+
 }

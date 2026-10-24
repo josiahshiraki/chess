@@ -30,6 +30,30 @@ public class Server {
             ));
         });
 
+        javalin.exception(BadRequestException.class, (e, ctx) -> {
+            ctx.status(400);
+            ctx.contentType("application/json");
+            ctx.result(new Gson().toJson(
+                    Map.of("message",e.getMessage())
+            ));
+        });
+
+        javalin.exception(UnauthorizedException.class, (e, ctx) -> {
+            ctx.status(401);
+            ctx.contentType("application/json");
+            ctx.result(new Gson().toJson(
+                    Map.of("message",e.getMessage())
+            ));
+        });
+
+        javalin.exception(Exception.class, (e, ctx) -> {
+            ctx.status(500);
+            ctx.contentType("application/json");
+            ctx.result(new Gson().toJson(
+                    Map.of("message", "Error: " + e.getMessage())
+            ));
+        });
+
         //DAO OBJS FOR DEPENDENCY INJECTION
         var userDAO = new MemoryUserDAO();
         var gameDAO = new MemoryGameDAO();
@@ -47,6 +71,8 @@ public class Server {
         //endpoints
         javalin.delete("/db", ctx -> clearHandler.clear(ctx));
         javalin.post("/user", ctx -> userHandler.register(ctx));
+        javalin.post("/session", ctx -> userHandler.login(ctx));
+        javalin.delete("/session", ctx -> userHandler.logout(ctx));
     }
 
     public int run(int desiredPort) {

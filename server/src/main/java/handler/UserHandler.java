@@ -2,6 +2,7 @@ package handler;
 
 import com.google.gson.Gson;
 import io.javalin.http.Context;
+import org.jetbrains.annotations.NotNull;
 import service.UserService;
 
 import model.*;
@@ -22,5 +23,22 @@ public class UserHandler {
         ctx.status(200);
         ctx.contentType("application/json");
         ctx.result(new Gson().toJson(result));
+    }
+
+    public void login(Context ctx){
+        LoginRequest loginUser = new Gson().fromJson(ctx.body(), LoginRequest.class);
+        RegisterResult result = userService.login(loginUser);
+
+        ctx.status(200);
+        ctx.contentType("application/json");
+        ctx.result(new Gson().toJson(result));
+;    }
+
+    public void logout(Context ctx) {
+        String authToken = ctx.header("authorization");
+        ctx.status(200);
+        ctx.contentType("application/json");
+        ctx.result("{}");
+
     }
 }
