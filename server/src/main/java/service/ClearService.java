@@ -14,7 +14,6 @@ public class ClearService {
     }
 
     public void clear(){
-        System.out.println("ClearService Called");
         userDAO.clear();
         gameDAO.clear();
         authDAO.clear();

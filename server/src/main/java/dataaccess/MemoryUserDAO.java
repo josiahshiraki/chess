@@ -1,13 +1,12 @@
 package dataaccess;
 
-import java.util.Map;
 import java.util.HashMap;
 
-import model.UserData;
-import model.AuthData;
-import model.GameData;
+import model.*;
 
 public class MemoryUserDAO implements UserDAO {
+
+    //<username, UserData>
     private static final HashMap<String, UserData> users = new HashMap<>();
 
     @Override
@@ -17,11 +16,12 @@ public class MemoryUserDAO implements UserDAO {
 
     @Override
     public void createUser(UserData user) {
-
+        //START HERE GO!!!!
+        users.put(user.username(), user);
     }
 
     @Override
     public UserData getUser(String username) {
-        return null;
+        return users.get(username);
     }
 }

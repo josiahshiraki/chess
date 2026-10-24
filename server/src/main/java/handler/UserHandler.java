@@ -16,6 +16,11 @@ public class UserHandler {
 
     public void register(Context ctx){
         UserData user = new Gson().fromJson(ctx.body(), UserData.class);
+
         RegisterResult result =  userService.register(user);
+
+        ctx.status(200);
+        ctx.contentType("application/json");
+        ctx.result(new Gson().toJson(result));
     }
 }

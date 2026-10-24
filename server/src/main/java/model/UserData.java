@@ -1,7 +1,7 @@
 package model;
 
 public record UserData(
-        String userName,
+        String username,
         String password,
         String email
 ){}
