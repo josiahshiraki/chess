@@ -9,4 +9,7 @@ public interface GameDAO {
     void clear();
     Collection<GameData> listGames();
     int insertGame(String gameName);
+    GameData getGame(int gameId);
+
+    void joinGame(int gameId, String username, String color);
 }

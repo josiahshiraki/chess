@@ -41,10 +41,11 @@ public class UserService {
 
 
     public RegisterResult login(LoginRequest user) {
+        if(checkMissingLog(user)){
+            throw new BadRequestException("Error: bad request");
+        }
         if(checkUnauthorized(user)){
             throw new UnauthorizedException("Error: unauthorized");
-        }else if(checkMissingLog(user)){
-            throw new BadRequestException("Error: bad request");
         }
 
         String authToken = UUID.randomUUID().toString();

@@ -31,4 +31,20 @@ public class MemoryGameDAO implements GameDAO{
         gameIdNum++;
         return currentGameId;
     }
+    @Override
+    public GameData getGame(int gameId){
+        return games.get(gameId);
+    }
+
+    @Override
+    public void joinGame(int gameId, String username, String color) {
+        GameData original = getGame(gameId);
+        GameData updated;
+        if(color.equals("WHITE")) {
+            updated = new GameData(gameId, username, original.blackUsername(), original.gameName(), original.game());
+        }else{
+            updated = new GameData(gameId, original.whiteUsername(), username, original.gameName(), original.game());
+        }
+        games.put(gameId, updated);
+    }
 }
