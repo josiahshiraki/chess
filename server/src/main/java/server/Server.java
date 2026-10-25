@@ -62,17 +62,19 @@ public class Server {
         //service objects
         var clearService = new ClearService(userDAO, gameDAO, authDAO);
         var userService = new UserService(userDAO, authDAO);
+        var gameService = new GameService(userDAO, gameDAO);
 
         //handler objects
         var userHandler = new UserHandler(userService);
         var clearHandler = new ClearHandler(clearService);
-        var gameHandler = new GameHandler();
+        var gameHandler = new GameHandler(gameService);
 
         //endpoints
         javalin.delete("/db", ctx -> clearHandler.clear(ctx));
         javalin.post("/user", ctx -> userHandler.register(ctx));
         javalin.post("/session", ctx -> userHandler.login(ctx));
         javalin.delete("/session", ctx -> userHandler.logout(ctx));
+        javalin.get("/game", ctx -> gameHandler.listGames(ctx));
     }
 
     public int run(int desiredPort) {
