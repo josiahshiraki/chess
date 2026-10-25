@@ -1,6 +1,7 @@
 package handler;
 
 import io.javalin.http.Context;
+import model.*;
 import service.GameService;
 
 public class GameHandler {
@@ -13,7 +14,7 @@ public class GameHandler {
 
     public void listGames(Context ctx) {
         String authToken = ctx.header("authorization");
-        gameService.listGames(authToken);
+        ListGamesResult games = gameService.listGames(authToken);
 
         ctx.status(200);
         ctx.contentType("application/json");
