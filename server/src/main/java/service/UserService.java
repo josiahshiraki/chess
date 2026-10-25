@@ -33,7 +33,10 @@ public class UserService {
     }
 
     private boolean checkMissingReg(UserData user){
-        return (user.username().isEmpty() || user.password().isEmpty() || user.email().isEmpty());
+        return (user == null ||
+                user.username() == null || user.username().isBlank() ||
+                user.password() == null || user.password().isBlank() ||
+                user.email() == null || user.email().isBlank());
     }
 
 
@@ -51,7 +54,9 @@ public class UserService {
     }
 
     private boolean checkMissingLog(LoginRequest user){
-        return (user.username().isEmpty() || user.password().isEmpty());
+        return (user == null ||
+                user.username() == null || user.username().isBlank() ||
+                user.password() == null || user.password().isBlank());
     }
 
     private boolean checkUnauthorized(LoginRequest loginUser){

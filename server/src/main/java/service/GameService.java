@@ -1,12 +1,14 @@
 package service;
 
 import dataaccess.*;
+import exception.BadRequestException;
 import exception.UnauthorizedException;
 import model.*;
 
 import java.util.ArrayList;
 import java.util.Collection;
 import java.util.List;
+import java.util.Objects;
 
 public class GameService {
     private final UserDAO userDAO;
@@ -31,5 +33,20 @@ public class GameService {
             gameList.add(new ListGameData(game.gameID(),game.whiteUsername(), game.blackUsername(), game.gameName()));
         }
         return new ListGamesResult(gameList);
+    }
+
+    public CreateGameResult createGame(String authToken, NewGame newGame) {
+        if (newGame == null) {
+            throw new BadRequestException("Error: bad request");
+        }
+        String gameName = newGame.gameName();
+        if(authDAO.getAuth(authToken) == null){
+            throw new UnauthorizedException("Error: unauthorized");
+        }
+        if(gameName == null || gameName.isBlank()){
+            throw new BadRequestException("Error: bad request");
+        }
+        int gameId = gameDAO.insertGame(gameName);
+        return new CreateGameResult(gameId);
     }
 }

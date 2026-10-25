@@ -24,6 +24,12 @@ public class GameHandler {
     }
 
     public void createGame( Context ctx) {
+        String authToken = ctx.header("authorization");
+        NewGame newGame = new Gson().fromJson(ctx.body(), NewGame.class);
+        CreateGameResult result = gameService.createGame(authToken, newGame);
 
+        ctx.status(200);
+        ctx.contentType("application/json");
+        ctx.result(new Gson().toJson(result));
     }
 }
