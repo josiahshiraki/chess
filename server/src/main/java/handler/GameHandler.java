@@ -1,7 +1,9 @@
 package handler;
 
+import com.google.gson.Gson;
 import io.javalin.http.Context;
 import model.*;
+import org.jetbrains.annotations.NotNull;
 import service.GameService;
 
 public class GameHandler {
@@ -14,10 +16,14 @@ public class GameHandler {
 
     public void listGames(Context ctx) {
         String authToken = ctx.header("authorization");
-        ListGamesResult games = gameService.listGames(authToken);
+        ListGamesResult result = gameService.listGames(authToken);
 
         ctx.status(200);
         ctx.contentType("application/json");
-        ctx.result("{}");
+        ctx.result(new Gson().toJson(result));
+    }
+
+    public void createGame( Context ctx) {
+
     }
 }

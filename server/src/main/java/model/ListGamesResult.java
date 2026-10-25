@@ -1,6 +1,7 @@
 package model;
+import java.util.Collection;
 import java.util.List;
 
 public record ListGamesResult(
-    List<ListGameData> games
+    Collection<ListGameData> games
 ){}

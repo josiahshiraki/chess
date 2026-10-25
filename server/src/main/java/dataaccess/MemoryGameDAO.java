@@ -18,7 +18,7 @@ public class MemoryGameDAO implements GameDAO{
     }
 
     @Override
-    public Collection<GameData> listGames(String authToken){
+    public Collection<GameData> listGames(){
         return games.values();
     }
 }

@@ -4,6 +4,10 @@ import dataaccess.*;
 import exception.UnauthorizedException;
 import model.*;
 
+import java.util.ArrayList;
+import java.util.Collection;
+import java.util.List;
+
 public class GameService {
     private final UserDAO userDAO;
     private final GameDAO gameDAO;
@@ -20,7 +24,12 @@ public class GameService {
         if(authDAO.getAuth(authToken) == null){
             throw new UnauthorizedException("Error: unauthorized");
         }
-        gameDAO.listGames(authToken);
-        return null;
+        Collection <GameData> games = gameDAO.listGames();
+        List<ListGameData> gameList = new ArrayList<>();
+
+        for (GameData game : games){
+            gameList.add(new ListGameData(game.gameID(),game.whiteUsername(), game.blackUsername(), game.gameName()));
+        }
+        return new ListGamesResult(gameList);
     }
 }
