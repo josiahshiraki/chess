@@ -3,7 +3,6 @@ package handler;
 import com.google.gson.Gson;
 import io.javalin.http.Context;
 import model.*;
-import org.jetbrains.annotations.NotNull;
 import service.GameService;
 
 public class GameHandler {
