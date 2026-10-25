@@ -63,4 +63,11 @@ public class UserService {
             return true; //returns true if username not found
         }
     }
+
+    public void logout(String authToken) {
+        if(authDAO.getAuth(authToken) == null){
+            throw new UnauthorizedException("Error: unauthorized");
+        }
+        authDAO.deleteAuth(authToken);
+    }
 }

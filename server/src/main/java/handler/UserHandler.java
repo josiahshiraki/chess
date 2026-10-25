@@ -36,6 +36,8 @@ public class UserHandler {
 
     public void logout(Context ctx) {
         String authToken = ctx.header("authorization");
+        userService.logout(authToken);
+
         ctx.status(200);
         ctx.contentType("application/json");
         ctx.result("{}");
