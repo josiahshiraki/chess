@@ -52,6 +52,7 @@ public class ClearServiceTest{
         assertNull(authDAO.getAuth("PHO DAC BIET"));
         assertTrue(gameDAO.listGames().isEmpty());
     }
+
 }
 
 
