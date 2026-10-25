@@ -23,12 +23,7 @@ public class UserServiceTest {
     }
     @Test
     public void registerSuccess() {
-        UserData user = new UserData(
-                "testUser",
-                "password123",
-                "test@example.com"
-        );
-
+        UserData user = new UserData("testUser", "password123", "test@example.com");
         RegisterResult result = userService.register(user);
 
         assertEquals("testUser", result.username());
@@ -40,43 +35,52 @@ public class UserServiceTest {
 
     @Test
     public void registerDuplicateUsername() {
-        UserData user = new UserData(
-                "player1", "password123", "player1@test.com"
-        );
+        UserData user = new UserData("player1", "password123", "player1@test.com");
         userService.register(user);
-
-        assertThrows(AlreadyTakenException.class,
-                () -> userService.register(user));
+        assertThrows(AlreadyTakenException.class, () -> userService.register(user));
     }
-
-
 
     @Test
     public void registerMissingUsername() {
-        UserData user = new UserData(
-                null, "password123", "player1@test.com"
-        );
-
-        assertThrows(BadRequestException.class,
-                () -> userService.register(user));
+        UserData user = new UserData(null, "password123", "player1@test.com");
+        assertThrows(BadRequestException.class, () -> userService.register(user));
     }
 
     @Test
     public void registerMissingPassword() {
-        UserData user = new UserData(
-                "player1", null, "player1@test.com"
-        );
-
-        assertThrows(BadRequestException.class,
-                () -> userService.register(user));
+        UserData user = new UserData("player1", null, "player1@test.com");
+        assertThrows(BadRequestException.class, () -> userService.register(user));
     }
 
     @Test
     public void registerMissingEmail() {
-        UserData user = new UserData(
-                "player1", "password123", null
-        );
-        assertThrows(BadRequestException.class,
-                () -> userService.register(user));
+        UserData user = new UserData("player1", "password123", null);
+        assertThrows(BadRequestException.class, () -> userService.register(user));
     }
+
+    @Test
+    public void loginWrongPassword() {
+        userService.register(new UserData("player1", "password123", "player1@test.com"));
+        assertThrows(UnauthorizedException.class, () -> userService.login(new LoginRequest("player1", "wrongPassword")));
+    }
+
+    @Test
+    public void loginNonexistentUser() {
+        assertThrows(UnauthorizedException.class, () -> userService.login(new LoginRequest("nobody", "password123")));
+    }
+
+
+    @Test
+    public void logoutSuccess() {
+        var result = userService.register(new UserData("player1", "password123", "player1@test.com"));
+        String token = result.authToken();
+        userService.logout(token);
+        assertNull(authDAO.getAuth(token));
+    }
+
+    @Test
+    public void logoutInvalidToken() {
+        assertThrows(UnauthorizedException.class, () -> userService.logout("invalid-token"));
+    }
+
 }
