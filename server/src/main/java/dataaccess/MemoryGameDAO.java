@@ -11,7 +11,7 @@ import java.util.Map;
 
 public class MemoryGameDAO implements GameDAO{
     //int represents ID, GameData represents list of game elements
-    private static final HashMap<Integer, GameData> games = new HashMap<>();
+    private final HashMap<Integer, GameData> games = new HashMap<>();
     private int gameIdNum = 1;
 
     @Override

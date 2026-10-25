@@ -62,7 +62,7 @@ public class Server {
         //service objects
         var clearService = new ClearService(userDAO, gameDAO, authDAO);
         var userService = new UserService(userDAO, authDAO);
-        var gameService = new GameService(userDAO, gameDAO, authDAO);
+        var gameService = new GameService(gameDAO, authDAO);
 
         //handler objects
         var userHandler = new UserHandler(userService);

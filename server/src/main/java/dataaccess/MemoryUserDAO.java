@@ -7,7 +7,7 @@ import model.*;
 public class MemoryUserDAO implements UserDAO {
 
     //<username, UserData>
-    private static final HashMap<String, UserData> users = new HashMap<>();
+    private final HashMap<String, UserData> users = new HashMap<>();
 
     @Override
     public void clear(){
