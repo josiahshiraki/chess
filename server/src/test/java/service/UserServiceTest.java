@@ -50,6 +50,7 @@ public class UserServiceTest {
     }
 
 
+
     @Test
     public void registerMissingUsername() {
         UserData user = new UserData(
