@@ -3,6 +3,7 @@ package dataaccess;
 import java.sql.*;
 import model.UserData;
 
+
 public class SQLUserDAO implements UserDAO{
     @Override
     public void clear() throws DataAccessException {
