@@ -29,8 +29,16 @@ public class UserServiceTest{
         assertEquals("testUser", result.username());
         assertNotNull(result.authToken());
 
-        assertNotNull(userDAO.getUser("testUser"));
-        assertNotNull(authDAO.getAuth(result.authToken()));
+        try {
+            assertNotNull(userDAO.getUser("testUser"));
+        } catch (DataAccessException e) {
+            throw new RuntimeException(e);
+        }
+        try {
+            assertNotNull(authDAO.getAuth(result.authToken()));
+        } catch (DataAccessException e) {
+            throw new RuntimeException(e);
+        }
     }
 
     @Test
@@ -75,7 +83,11 @@ public class UserServiceTest{
         var result = userService.register(new UserData("player1", "password123", "player1@test.com"));
         String token = result.authToken();
         userService.logout(token);
-        assertNull(authDAO.getAuth(token));
+        try {
+            assertNull(authDAO.getAuth(token));
+        } catch (DataAccessException e) {
+            throw new RuntimeException(e);
+        }
     }
 
     @Test

@@ -19,15 +19,27 @@ public class UserService {
 
 
     public RegisterResult register(UserData user){
-        if(userDAO.getUser(user.username()) != null){
-            throw new AlreadyTakenException("Error: already taken");
-        }else if(checkMissingReg(user)){
-            throw new BadRequestException("Error: bad request");
+        try {
+            if(userDAO.getUser(user.username()) != null){
+                throw new AlreadyTakenException("Error: already taken");
+            }else if(checkMissingReg(user)){
+                throw new BadRequestException("Error: bad request");
+            }
+        } catch (DataAccessException e) {
+            throw new RuntimeException(e);
         }
 
-        userDAO.createUser(user);
+        try {
+            userDAO.createUser(user);
+        } catch (DataAccessException e) {
+            throw new RuntimeException(e);
+        }
         String authToken = UUID.randomUUID().toString();
-        authDAO.createAuth(new AuthData(authToken, user.username()));
+        try {
+            authDAO.createAuth(new AuthData(authToken, user.username()));
+        } catch (DataAccessException e) {
+            throw new RuntimeException(e);
+        }
 
         return new RegisterResult(user.username(), authToken);
     }
@@ -49,7 +61,11 @@ public class UserService {
         }
 
         String authToken = UUID.randomUUID().toString();
-        authDAO.createAuth(new AuthData(authToken, user.username()));
+        try {
+            authDAO.createAuth(new AuthData(authToken, user.username()));
+        } catch (DataAccessException e) {
+            throw new RuntimeException(e);
+        }
 
         return new RegisterResult(user.username(), authToken);
     }
@@ -62,18 +78,30 @@ public class UserService {
 
     private boolean checkUnauthorized(LoginRequest loginUser){
         //first check if username in database, next check if password of that user matches
-        if(userDAO.getUser(loginUser.username()) != null){
-            String comparePass = userDAO.getUser(loginUser.username()).password();
-            return !Objects.equals(loginUser.password(), comparePass); // returns true if password does not match
-        }else{
-            return true; //returns true if username not found
+        try {
+            if(userDAO.getUser(loginUser.username()) != null){
+                String comparePass = userDAO.getUser(loginUser.username()).password();
+                return !Objects.equals(loginUser.password(), comparePass); // returns true if password does not match
+            }else{
+                return true; //returns true if username not found
+            }
+        } catch (DataAccessException e) {
+            throw new RuntimeException(e);
         }
     }
 
     public void logout(String authToken) {
-        if(authDAO.getAuth(authToken) == null){
-            throw new UnauthorizedException("Error: unauthorized");
+        try {
+            if(authDAO.getAuth(authToken) == null){
+                throw new UnauthorizedException("Error: unauthorized");
+            }
+        } catch (DataAccessException e) {
+            throw new RuntimeException(e);
         }
-        authDAO.deleteAuth(authToken);
+        try {
+            authDAO.deleteAuth(authToken);
+        } catch (DataAccessException e) {
+            throw new RuntimeException(e);
+        }
     }
 }

@@ -38,19 +38,47 @@ public class ClearServiceTest{
 
         clearService.clear();
 
-        assertNull(userDAO.getUser("player1"));
-        assertNull(authDAO.getAuth(token));
-        assertNull(gameDAO.getGame(gameID));
-        assertTrue(gameDAO.listGames().isEmpty());
+        try {
+            assertNull(userDAO.getUser("player1"));
+        } catch (DataAccessException e) {
+            throw new RuntimeException(e);
+        }
+        try {
+            assertNull(authDAO.getAuth(token));
+        } catch (DataAccessException e) {
+            throw new RuntimeException(e);
+        }
+        try {
+            assertNull(gameDAO.getGame(gameID));
+        } catch (DataAccessException e) {
+            throw new RuntimeException(e);
+        }
+        try {
+            assertTrue(gameDAO.listGames().isEmpty());
+        } catch (DataAccessException e) {
+            throw new RuntimeException(e);
+        }
     }
 
     @Test
     public void clearEmptyDatabase(){
         assertDoesNotThrow(() -> clearService.clear());
 
-        assertNull(userDAO.getUser("WHAT DA HERR??!"));
-        assertNull(authDAO.getAuth("PHO DAC BIET"));
-        assertTrue(gameDAO.listGames().isEmpty());
+        try {
+            assertNull(userDAO.getUser("WHAT DA HERR??!"));
+        } catch (DataAccessException e) {
+            throw new RuntimeException(e);
+        }
+        try {
+            assertNull(authDAO.getAuth("PHO DAC BIET"));
+        } catch (DataAccessException e) {
+            throw new RuntimeException(e);
+        }
+        try {
+            assertTrue(gameDAO.listGames().isEmpty());
+        } catch (DataAccessException e) {
+            throw new RuntimeException(e);
+        }
     }
 
 }

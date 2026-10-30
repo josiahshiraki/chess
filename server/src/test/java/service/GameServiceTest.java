@@ -35,7 +35,12 @@ public class GameServiceTest {
         var result = gameService.createGame(authToken, new NewGame("test game"));
         assertTrue(result.gameID() > 0);
 
-        GameData game = gameDAO.getGame(result.gameID());
+        GameData game = null;
+        try {
+            game = gameDAO.getGame(result.gameID());
+        } catch (DataAccessException e) {
+            throw new RuntimeException(e);
+        }
         assertNotNull(game);
         assertNull(game.whiteUsername());
         assertNull(game.blackUsername());
@@ -66,7 +71,12 @@ public class GameServiceTest {
     public void joinWhiteSuccess(){
         int gameID = gameService.createGame(authToken, new NewGame("Test Game")).gameID();
         gameService.joinGame(authToken, new JoinGameData("WHITE", gameID));
-        GameData game = gameDAO.getGame(gameID);
+        GameData game = null;
+        try {
+            game = gameDAO.getGame(gameID);
+        } catch (DataAccessException e) {
+            throw new RuntimeException(e);
+        }
 
         assertEquals("player1", game.whiteUsername());
         assertNull(game.blackUsername());
@@ -77,7 +87,12 @@ public class GameServiceTest {
         int gameID = gameService.createGame(authToken, new NewGame("Test Game")).gameID();
         gameService.joinGame(authToken, new JoinGameData("BLACK", gameID));
 
-        GameData game = gameDAO.getGame(gameID);
+        GameData game = null;
+        try {
+            game = gameDAO.getGame(gameID);
+        } catch (DataAccessException e) {
+            throw new RuntimeException(e);
+        }
 
         assertEquals("player1", game.blackUsername());
         assertNull(game.whiteUsername());
