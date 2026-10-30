@@ -59,7 +59,7 @@ public class GameServiceTest {
 
     @Test
     public void listGamesUnauthorized(){
-        assertThrows(UnauthorizedException.class, () -> gameService.listGames("BAD"));
+        assertThrows(UnauthorizedException.class, () -> gameService.listGames("GAY"));
     }
 
     @Test
