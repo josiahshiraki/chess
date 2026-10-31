@@ -28,7 +28,7 @@ public class GameService {
         } catch (DataAccessException e) {
             throw new RuntimeException(e);
         }
-        Collection <GameData> games = null;
+        Collection <GameData> games;
         try {
             games = gameDAO.listGames();
         } catch (DataAccessException e) {

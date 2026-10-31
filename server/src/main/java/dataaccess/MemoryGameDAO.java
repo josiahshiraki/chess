@@ -35,7 +35,7 @@ public class MemoryGameDAO implements GameDAO{
 
     @Override
     public void joinGame(int gameId, String username, String color) throws DataAccessException {
-        GameData original = null;
+        GameData original;
         try {
             original = getGame(gameId);
         } catch (DataAccessException e) {

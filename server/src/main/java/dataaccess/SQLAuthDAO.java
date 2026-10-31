@@ -20,7 +20,7 @@ public class SQLAuthDAO implements AuthDAO{
                 )
                 """;
         try(Connection conn = DatabaseManager.getConnection(); PreparedStatement ps = conn.prepareStatement(statement)){
-            ps.execute();
+            ps.executeUpdate();
         }catch(SQLException e){
             throw new DataAccessException("Unable to configure database", e);
         }
@@ -83,9 +83,9 @@ public class SQLAuthDAO implements AuthDAO{
         try(Connection conn = DatabaseManager.getConnection()){
             PreparedStatement ps = conn.prepareStatement(statement);
             ps.setString(1,AuthToken);
-            ps.executeQuery();
+            ps.executeUpdate();
         }catch(SQLException e){
-            throw new DataAccessException("Unable to clear authtokens", e);
+            throw new DataAccessException("Unable to delete authtoken", e);
         }
     }
 

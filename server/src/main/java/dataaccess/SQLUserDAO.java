@@ -2,7 +2,7 @@ package dataaccess;
 
 import java.sql.*;
 import model.UserData;
-
+import org.mindrot.jbcrypt.BCrypt;
 
 public class SQLUserDAO implements UserDAO{
 
@@ -40,14 +40,16 @@ public class SQLUserDAO implements UserDAO{
     @Override
     public void createUser(UserData user) throws DataAccessException {
         String statement = """
-                INSERT INTO  users (username, password, email)
+                INSERT INTO users (username, password, email)
                 VALUES (?,?,?)
                 """;
 
         //may need to handle race conditions and throwing specific duplicate error for duplicate primary key (users)
         try(Connection conn = DatabaseManager.getConnection(); PreparedStatement ps = conn.prepareStatement(statement)){
             ps.setString(1,user.username());
-            ps.setString(2,user.password());
+
+            String hashedPassword = BCrypt.hashpw(user.password(), BCrypt.gensalt());
+            ps.setString(2,hashedPassword);
             ps.setString(3,user.email());
 
             ps.executeUpdate();

@@ -3,6 +3,7 @@ import exception.*;
 
 import dataaccess.*;
 import model.*;
+import org.mindrot.jbcrypt.BCrypt;
 
 import java.util.Objects;
 import java.util.UUID;
@@ -81,7 +82,7 @@ public class UserService {
         try {
             if(userDAO.getUser(loginUser.username()) != null){
                 String comparePass = userDAO.getUser(loginUser.username()).password();
-                return !Objects.equals(loginUser.password(), comparePass); // returns true if password does not match
+                return BCrypt.checkpw(loginUser.password(), comparePass); // returns true if password does not match
             }else{
                 return true; //returns true if username not found
             }

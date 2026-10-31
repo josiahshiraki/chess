@@ -55,14 +55,17 @@ public class Server {
         });
 
         SQLUserDAO userDAO;
+        SQLGameDAO gameDAO;
+        SQLAuthDAO authDAO;
         try {
             userDAO = new SQLUserDAO();
+            gameDAO = new SQLGameDAO();
+            authDAO = new SQLAuthDAO();
         } catch (DataAccessException e) {
             throw new IllegalStateException("Failed to initialize database", e);
         }
 
-        var gameDAO = new MemoryGameDAO();
-        var authDAO = new MemoryAuthDAO();
+
 
         //service objects
         var clearService = new ClearService(userDAO, gameDAO, authDAO);
