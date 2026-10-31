@@ -82,7 +82,7 @@ public class UserService {
         try {
             if(userDAO.getUser(loginUser.username()) != null){
                 String comparePass = userDAO.getUser(loginUser.username()).password();
-                return BCrypt.checkpw(loginUser.password(), comparePass); // returns true if password does not match
+                return !BCrypt.checkpw(loginUser.password(), comparePass); // returns true if password does not match
             }else{
                 return true; //returns true if username not found
             }
