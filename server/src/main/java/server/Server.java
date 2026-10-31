@@ -17,7 +17,7 @@ public class Server {
     private final Javalin javalin;
 
 
-    public Server() {
+    public Server(){
 
         javalin = Javalin.create(config -> config.staticFiles.add("web"));
 
@@ -54,8 +54,13 @@ public class Server {
             ));
         });
 
-        //DAO OBJS FOR DEPENDENCY INJECTION
-        var userDAO = new MemoryUserDAO();
+        SQLUserDAO userDAO;
+        try {
+            userDAO = new SQLUserDAO();
+        } catch (DataAccessException e) {
+            throw new IllegalStateException("Failed to initialize database", e);
+        }
+
         var gameDAO = new MemoryGameDAO();
         var authDAO = new MemoryAuthDAO();
 

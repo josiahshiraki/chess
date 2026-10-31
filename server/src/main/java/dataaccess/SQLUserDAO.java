@@ -11,14 +11,15 @@ public class SQLUserDAO implements UserDAO{
     }
 
     private void configureDatabase() throws DataAccessException {
-        String sql = """
+        DatabaseManager.createDatabase();
+        String statement = """
             CREATE TABLE IF NOT EXISTS users (
             username varchar(256) PRIMARY KEY,
             password varchar(256) NOT NULL,
             email varchar(256) NOT NULL
             )
             """;
-        try(Connection conn = DatabaseManager.getConnection(); PreparedStatement ps = conn.prepareStatement(sql)){
+        try(Connection conn = DatabaseManager.getConnection(); PreparedStatement ps = conn.prepareStatement(statement)){
             ps.execute();
         }catch(SQLException e){
             throw new DataAccessException("Unable to configure database", e);
