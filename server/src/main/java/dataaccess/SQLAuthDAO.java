@@ -39,7 +39,18 @@ public class SQLAuthDAO implements AuthDAO{
 
     @Override
     public void createAuth(AuthData authData) throws DataAccessException {
+        String statement = """
+                Insert INTO authtokens (authtoken, username)
+                VALUES (?,?)
+                """;
+        try(Connection conn = DatabaseManager.getConnection(); PreparedStatement ps = conn.prepareStatement(statement)){
+            ps.setString(1, authData.authToken());
+            ps.setString(2, authData.username());
 
+            ps.executeUpdate();
+        }catch(SQLException e){
+            throw new DataAccessException("Unable to create new auth token", e);
+        }
     }
 
     @Override
@@ -77,6 +88,7 @@ public class SQLAuthDAO implements AuthDAO{
             throw new DataAccessException("Unable to clear authtokens", e);
         }
     }
+
 
     private AuthData readAuthData(ResultSet rs) throws SQLException {
         String username = rs.getString("username");

@@ -53,7 +53,7 @@ public class SQLUserDAO implements UserDAO{
             ps.executeUpdate();
 
         }catch(SQLException e){
-            throw new DataAccessException("Unable to create New User", e);
+            throw new DataAccessException("Unable to create new user", e);
         }
     }
 
