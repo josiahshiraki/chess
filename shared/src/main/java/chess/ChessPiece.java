@@ -194,7 +194,10 @@ public class ChessPiece {
 
 
     private void promotions(ArrayList<ChessMove> moves, ChessPosition pos, int r, int c, int backRank){
-        ChessPiece.PieceType [] bigBoys = {ChessPiece.PieceType.ROOK, ChessPiece.PieceType.QUEEN, ChessPiece.PieceType.KNIGHT, ChessPiece.PieceType.BISHOP};
+        ChessPiece.PieceType [] bigBoys = {ChessPiece.PieceType.ROOK,
+                ChessPiece.PieceType.QUEEN,
+                ChessPiece.PieceType.KNIGHT,
+                ChessPiece.PieceType.BISHOP};
         if(r == backRank) {
             for (ChessPiece.PieceType promote: bigBoys) {
                 moves.add(new ChessMove(pos, new ChessPosition(r, c), promote));

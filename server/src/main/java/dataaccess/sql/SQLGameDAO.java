@@ -73,7 +73,9 @@ public class SQLGameDAO implements GameDAO {
                 INSERT INTO games (gameName, game)
                 VALUES(?,?)
                 """;
-        try(Connection conn = DatabaseManager.getConnection(); PreparedStatement ps = conn.prepareStatement(statement, Statement.RETURN_GENERATED_KEYS)){
+        try(Connection conn = DatabaseManager.getConnection();
+            PreparedStatement ps = conn.prepareStatement(statement, Statement.RETURN_GENERATED_KEYS)){
+
             ps.setString(1, gameName);
 
             ChessGame chessGame = new ChessGame();

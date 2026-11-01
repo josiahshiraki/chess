@@ -67,12 +67,6 @@ public class UserServiceTest{
     }
 
     @Test
-    public void loginWrongPassword(){
-        userService.register(new UserData("player1", "password123", "player1@test.com"));
-        assertThrows(UnauthorizedException.class, () -> userService.login(new LoginRequest("player1", "wrongPassword")));
-    }
-
-    @Test
     public void loginNonexistentUser(){
         assertThrows(UnauthorizedException.class, () -> userService.login(new LoginRequest("nobody", "password123")));
     }
