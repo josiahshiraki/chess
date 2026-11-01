@@ -13,10 +13,10 @@ public class MemoryAuthDAO implements AuthDAO{
     public void createAuth(AuthData auth) throws DataAccessException {
         authTokens.put(auth.authToken(), auth);
     }
-    public AuthData getAuth(String AuthToken) throws DataAccessException {
-        return authTokens.get(AuthToken);
+    public AuthData getAuth(String authToken) throws DataAccessException {
+        return authTokens.get(authToken);
     }
-    public void deleteAuth(String AuthToken) throws DataAccessException {
-        authTokens.remove(AuthToken);
+    public void deleteAuth(String authToken) throws DataAccessException {
+        authTokens.remove(authToken);
     }
 }

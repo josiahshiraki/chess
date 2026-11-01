@@ -56,7 +56,7 @@ public class SQLAuthDAO implements AuthDAO {
     }
 
     @Override
-    public AuthData getAuth(String AuthToken) throws DataAccessException {
+    public AuthData getAuth(String authToken) throws DataAccessException {
         String statement = """
                 SELECT authtoken, username
                 FROM authtokens
@@ -64,7 +64,7 @@ public class SQLAuthDAO implements AuthDAO {
                 """;
         try(Connection conn = DatabaseManager.getConnection()){
             PreparedStatement ps = conn.prepareStatement(statement);
-            ps.setString(1, AuthToken);
+            ps.setString(1, authToken);
             ResultSet rs = ps.executeQuery();
             if(rs.next()){
                 return readAuthData(rs);
@@ -77,14 +77,14 @@ public class SQLAuthDAO implements AuthDAO {
     }
 
     @Override
-    public void deleteAuth(String AuthToken) throws DataAccessException {
+    public void deleteAuth(String authToken) throws DataAccessException {
         String statement = """
                         DELETE FROM authtokens
                         WHERE authtoken = ?;
                         """;
         try(Connection conn = DatabaseManager.getConnection()){
             PreparedStatement ps = conn.prepareStatement(statement);
-            ps.setString(1,AuthToken);
+            ps.setString(1,authToken);
             ps.executeUpdate();
         }catch(SQLException e){
             throw new DataAccessException("Unable to delete authtoken", e);

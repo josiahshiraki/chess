@@ -99,15 +99,21 @@ public class ChessPiece {
                 break;
             case PieceType.QUEEN:
                 int [][] qDir = {{1,0},{0,1},{-1,0},{0,-1},{1,1},{1,-1},{-1,1},{-1,-1}};
-                for (int [] dir : qDir) getDir(moves,board,myPosition,enemyColor,dir);
+                for (int [] dir : qDir){
+                    getDir(moves,board,myPosition,enemyColor,dir);
+                }
                 break;
             case PieceType.BISHOP:
                 int [][] bDir = {{1,1},{1,-1},{-1,1},{-1,-1}};
-                for (int [] dir : bDir) getDir(moves,board,myPosition,enemyColor,dir);
+                for (int [] dir : bDir){
+                    getDir(moves,board,myPosition,enemyColor,dir);
+                }
                 break;
             case PieceType.ROOK:
                 int [][] rDir = {{1,0},{-1,0},{0,1},{0,-1}};
-                for (int [] dir : rDir) getDir(moves,board,myPosition,enemyColor,dir);
+                for (int [] dir : rDir){
+                    getDir(moves,board,myPosition,enemyColor,dir);
+                }
                 break;
             case PieceType.KNIGHT:
                 int [][] kMoves = {{r+2,c-1},{r+2,c+1},{r-1,c+2},{r+1,c+2},{r-2,c-1},{r-2,c+1},{r-1,c-2},{r+1,c-2}};
@@ -203,8 +209,12 @@ public class ChessPiece {
 
 
         for(int [] move : possible){
-            if(move[0] <= 0 || move[0] >= 9)continue;
-            if(move[1] <= 0 || move[1] >= 9)continue;
+            if(move[0] <= 0 || move[0] >= 9){
+                continue;
+            }
+            if(move[1] <= 0 || move[1] >= 9){
+                continue;
+            }
 
 
             ChessPosition toMove = new ChessPosition(move[0], move[1]);
