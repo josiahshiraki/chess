@@ -47,7 +47,7 @@ public class SQLGameDAOTest{
 
     @Test
     public void listGamesEmpty() throws DataAccessException{
-        Collection<GameData> games = gameDAO.listGames();
+        Collection <GameData> games = gameDAO.listGames();
 
         assertNotNull(games);
         assertTrue(games.isEmpty());

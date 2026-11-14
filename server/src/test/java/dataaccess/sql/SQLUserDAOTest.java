@@ -73,7 +73,6 @@ public class SQLUserDAOTest {
     @Test
     public void clearUsers() throws DataAccessException{
         userDAO.createUser(new UserData("player1", "pass1", "one@test.com"));
-
         userDAO.createUser(new UserData("player2", "pass2", "two@test.com"));
 
         userDAO.clear();
