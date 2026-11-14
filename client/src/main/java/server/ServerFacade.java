@@ -20,30 +20,47 @@ public class ServerFacade {
         serverUrl = url;
     }
 
+    public void clear() throws ResponseException {
+        var request = buildRequest("DELETE", "/db", null, null);
+        var response = sendRequest(request);
+        handleResponse(response, null);
+    }
+
     public RegisterResult register(UserData user) throws ResponseException{
-        var request = buildRequest("POST", "/user", user);
+        var request = buildRequest("POST", "/user", user, null);
         var response = sendRequest(request);
         return handleResponse(response,RegisterResult.class);
     }
 
-    public  RegisterResult login(LoginRequest logInfo){
-        var request = buildRequest("POST","/session", logInfo);
+    public  RegisterResult login(LoginRequest logInfo) throws ResponseException{
+        var request = buildRequest("POST","/session", logInfo, null);
         var response = sendRequest(request);
         return handleResponse(response,RegisterResult.class);
+    }
+
+    public void logout(String authToken) throws ResponseException{
+        var request = buildRequest("DELETE", "/session", null, authToken);
+        var response = sendRequest(request);
+        handleResponse(response, null);
     }
 
 
     //method: POST,PUT,DELETE, or GET
     //path: user,game, auth
     //model obj that has the packaged info
-    private HttpRequest buildRequest(String method, String path, Object body){
+    //authToken required for some endpoints, null if not required
+    private HttpRequest buildRequest(String method, String path, Object body, String authToken) {
         var request = HttpRequest.newBuilder()
                 .uri(URI.create(serverUrl + path))
                 .method(method, makeRequestBody(body));
-        if (body != null){
-            request.setHeader("Content-Type", "application/json");
-        }
-        return request.build();
+
+    if(authToken != null){
+        request.setHeader("Authorization", authToken);
+    }else if (body != null){
+        request.setHeader("Content-Type", "application/json");
+    }
+
+    return request.build();
     }
 
     private BodyPublisher makeRequestBody(Object request){

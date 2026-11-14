@@ -22,6 +22,11 @@ public class ServerFacadeTests{
         facade = new ServerFacade("http://localhost:" + port);
     }
 
+    @BeforeEach
+    public void clearDataBase() throws ResponseException{
+        facade.clear();
+    }
+
     @AfterAll
     static void stopServer(){
         server.stop();
@@ -45,10 +50,24 @@ public class ServerFacadeTests{
 
     @Test
     public void loginTest() throws Exception {
-        UserData user = new UserData("Josiah", "turtle", "orange_juice@gmail.com");
+        UserData user = new UserData("Sam", "Penguin", "orange_juice@gmail.com");
         facade.register(user);
-        ResponseException exception = assertThrows(ResponseException.class, () -> facade.register(user));
+        LoginRequest log = new LoginRequest("Sam", "Penguin");
+        RegisterResult result = facade.login(log);
+        assertEquals("Sam", result.username());
+        assertNotNull(result.authToken());
+    }
 
-        assertEquals(403, exception.getStatusCode());
+    @Test
+    public void logout() throws Exception {
+        UserData user = new UserData("Sam", "Penguin", "orange_juice@gmail.com");
+        facade.register(user);
+        LoginRequest log = new LoginRequest("Sam", "Penguin");
+        RegisterResult result = facade.login(log);
+
+        String authToken = result.authToken();
+
+        assertDoesNotThrow(() -> facade.logout(authToken));
+
     }
 }
