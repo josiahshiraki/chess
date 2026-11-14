@@ -44,6 +44,24 @@ public class ServerFacade {
         handleResponse(response, null);
     }
 
+    public ListGamesResult listGames(String authToken) throws ResponseException{
+        var request = buildRequest("GET", "/game", null, authToken);
+        var response = sendRequest(request);
+        return handleResponse(response, ListGamesResult.class);
+    }
+
+    public CreateGameResult createGame(String authToken, NewGame game) throws ResponseException{
+        var request = buildRequest("POST", "/game", game, authToken);
+        var response = sendRequest(request);
+        return handleResponse(response, CreateGameResult.class);
+    }
+
+    public void joinGame(String authToken, JoinGameData joinData) throws ResponseException{
+        var request = buildRequest("PUT", "/game", joinData, authToken);
+        var response = sendRequest(request);
+        handleResponse(response, null);
+    }
+
 
     //method: POST,PUT,DELETE, or GET
     //path: user,game, auth
@@ -56,7 +74,7 @@ public class ServerFacade {
 
     if(authToken != null){
         request.setHeader("Authorization", authToken);
-    }else if (body != null){
+    }else{
         request.setHeader("Content-Type", "application/json");
     }
 

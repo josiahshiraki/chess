@@ -70,4 +70,6 @@ public class ServerFacadeTests{
         assertDoesNotThrow(() -> facade.logout(authToken));
 
     }
+
+
 }
