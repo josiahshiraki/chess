@@ -5,7 +5,6 @@ import com.google.gson.JsonObject;
 import exception.ResponseException;
 import model.*;
 
-import java.lang.ref.ReferenceQueue;
 import java.net.*;
 import java.net.http.*;
 import java.net.http.HttpRequest.BodyPublisher;
@@ -29,12 +28,14 @@ public class ServerFacade {
     public RegisterResult register(UserData user) throws ResponseException{
         var request = buildRequest("POST", "/user", user, null);
         var response = sendRequest(request);
+        //RegisterResult: username, authToken
         return handleResponse(response,RegisterResult.class);
     }
 
-    public  RegisterResult login(LoginRequest logInfo) throws ResponseException{
+    public RegisterResult login(LoginRequest logInfo) throws ResponseException{
         var request = buildRequest("POST","/session", logInfo, null);
         var response = sendRequest(request);
+        //RegisterResult: username, authToken
         return handleResponse(response,RegisterResult.class);
     }
 
@@ -47,12 +48,14 @@ public class ServerFacade {
     public ListGamesResult listGames(String authToken) throws ResponseException{
         var request = buildRequest("GET", "/game", null, authToken);
         var response = sendRequest(request);
+        //ListGameResult: Collection <ListGameData{...}> games
         return handleResponse(response, ListGamesResult.class);
     }
 
     public CreateGameResult createGame(String authToken, NewGame game) throws ResponseException{
         var request = buildRequest("POST", "/game", game, authToken);
         var response = sendRequest(request);
+        //CreateGameResult: int gameID
         return handleResponse(response, CreateGameResult.class);
     }
 
@@ -72,9 +75,10 @@ public class ServerFacade {
                 .uri(URI.create(serverUrl + path))
                 .method(method, makeRequestBody(body));
 
-    if(authToken != null){
+    if(authToken != null) {//sets Authorization header
         request.setHeader("Authorization", authToken);
-    }else{
+    }
+    if(body != null){// sets Content-Type header
         request.setHeader("Content-Type", "application/json");
     }
 
@@ -91,12 +95,14 @@ public class ServerFacade {
 
     private HttpResponse<String> sendRequest(HttpRequest request) throws ResponseException {
         try{
-            return client.send(request, BodyHandlers.ofString());
+            return client.send(request, BodyHandlers.ofString()); //returns server response with body (could be empty)
         }catch (Exception e){
             throw new ResponseException(e.getMessage(), 500);
         }
     }
 
+    // T is a java placeholder for a Class name e.g. AuthData
+    // Mostly handles error catching, if no error detected returns the obj of specified class
     private <T> T handleResponse(HttpResponse<String> response, Class<T> responseClass) throws ResponseException {
         var status = response.statusCode();
 
