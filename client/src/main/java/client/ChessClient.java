@@ -51,6 +51,7 @@ public class ChessClient {
     }
 
     private String register(String [] params) throws ResponseException{
+        assertSignedOut();
         if(params.length == 3){
             try {
                 RegisterResult registered = server.register(new UserData(params[0], params[1], params[2]));
@@ -67,6 +68,7 @@ public class ChessClient {
     }
 
     private String login(String [] params) throws ResponseException{
+        assertSignedOut();
         if(params.length == 2){
             try {
                 RegisterResult loggedIn = server.login(new LoginRequest(params[0], params[1]));
@@ -95,7 +97,7 @@ public class ChessClient {
         assertSignedIn();
         if(params.length == 1){
             CreateGameResult res = server.createGame(authToken, new NewGame(params[0]));
-            return "Successfully created game! gameID: " + res.gameID();
+            return "Successfully created game!";
         }
         throw new ResponseException("Expected one input <NAME>", 400);
     }
@@ -153,14 +155,6 @@ public class ChessClient {
         if(params.length == 2){
             checkNumber(params[0]);
             checkColor(params[1]);
-//            int index = Integer.parseInt(params[0])-1;
-//            var listG = server.listGames(authToken).games();
-//            ListGameData [] newList = new ListGameData[listG.size()];
-//            int i = 0;
-//            for(ListGameData game : listG){
-//                newList[i] = game;
-//                i++;
-//            }
             int gameID = findGame(params);
             server.joinGame(authToken, new JoinGameData(params[1].toUpperCase(), gameID));
             state = INGAME;
@@ -240,6 +234,11 @@ public class ChessClient {
     private void assertSignedIn() throws ResponseException{
         if (state == SIGNED_OUT){
             throw new ResponseException("You must be signed in", 400);
+        }
+    }
+    private void assertSignedOut() throws ResponseException{
+        if (state == SIGNED_IN){
+            throw new ResponseException("You must be signed OUT", 400);
         }
     }
 }

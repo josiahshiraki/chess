@@ -83,7 +83,7 @@ public class ServerFacadeTests{
     }
 
     @Test
-    public void ListGames() throws Exception{
+    public void listGames() throws Exception{
         UserData user = new UserData("Sam", "Penguin", "orange_juice@gmail.com");
         facade.register(user);
         LoginRequest log = new LoginRequest("Sam", "Penguin");
