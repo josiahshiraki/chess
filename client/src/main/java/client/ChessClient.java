@@ -185,7 +185,7 @@ public class ChessClient {
         if(params.length == 1){
             try{
                 int gameNum = findGame(params);
-                server.joinGame(authToken, new JoinGameData(null, gameNum));
+                //server.joinGame(authToken, new JoinGameData(null, gameNum));
                 state = State.INGAME;
                 ChessBoard observe = new ChessBoard();
                 observe.resetBoard();
