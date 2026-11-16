@@ -1,14 +1,15 @@
 package client;
 
 import chess.ChessBoard;
+import chess.ChessGame;
 import exception.ResponseException;
 import model.*;
 import server.ServerFacade;
 import ui.RenderBoard;
 
 import java.util.Arrays;
-import java.util.Locale;
 
+import static chess.ChessGame.TeamColor.BLACK;
 import static chess.ChessGame.TeamColor.WHITE;
 import static client.State.*;
 
@@ -51,20 +52,33 @@ public class ChessClient {
 
     private String register(String [] params) throws ResponseException{
         if(params.length == 3){
-            RegisterResult registered = server.register(new UserData(params[0],params[1],params[2]));
-            this.authToken = registered.authToken();
-            state = State.SIGNED_IN;
-            return "CHESSへよこそう！ currently logged in as " + registered.username();
+            try {
+                RegisterResult registered = server.register(new UserData(params[0], params[1], params[2]));
+                this.authToken = registered.authToken();
+                state = State.SIGNED_IN;
+                return "CHESSへよこそう！ currently logged in as " + registered.username();
+            }catch(ResponseException e){
+                if(e.getStatusCode()==403){
+                    return "Username is already taken. Please choose another username.";
+                }
+            }
         }
         throw new ResponseException("expected three inputs <USERNAME> <PASSWORD> <EMAIL>", 400);
     }
 
     private String login(String [] params) throws ResponseException{
         if(params.length == 2){
-            RegisterResult loggedIn = server.login(new LoginRequest(params[0], params[1]));
-            this.authToken = loggedIn.authToken();
-            state = State.SIGNED_IN;
-            return "CHESSへよこそう！ currently logged in as " + loggedIn.username();
+            try {
+                RegisterResult loggedIn = server.login(new LoginRequest(params[0], params[1]));
+                this.authToken = loggedIn.authToken();
+                state = State.SIGNED_IN;
+                return "CHESSへよこそう！ currently logged in as " + loggedIn.username();
+            }catch(ResponseException e){
+                if(e.getStatusCode()==401){
+                    return "Incorrect Username or Password";
+                }
+            }
+
         }
         throw new ResponseException("expected two inputs <USERNAME> <PASSWORD>", 400);
     }
@@ -92,17 +106,46 @@ public class ChessClient {
         assertSignedIn();
         ListGamesResult result =  server.listGames(authToken);
         StringBuilder retString = new StringBuilder();
-        int i = 0;
+        int i = 1;
+        //print empty not null
         for(ListGameData game : result.games()){
-            retString.append(String.format("%d - Game Name: %s, GameID: %d, White Username: %s, BlackUsername: %s\n",
+            String usernameW = game.whiteUsername();
+            String usernameB = game.blackUsername();
+            if(game.whiteUsername() == null){
+                usernameW = "[EMPTY]";
+            }
+            if(game.blackUsername() == null){
+                usernameB = "[EMPTY]";
+            }
+            retString.append(String.format("%d - Game Name: %s, White Username: %s, BlackUsername: %s\n",
                     i,
                     game.gameName(),
-                    game.gameID(),
-                    game.whiteUsername(),
-                    game.blackUsername()));
+                    usernameW,
+                    usernameB));
             i++;
         }
         return retString.toString();
+    }
+
+    private int findGame(String [] params){
+        int index;
+        try {
+            index = Integer.parseInt(params[0]) - 1;
+        }catch(NumberFormatException e){
+            throw new ResponseException("must be a number", 400);
+        }
+        try {
+            var listG = server.listGames(authToken).games();
+            ListGameData[] newList = new ListGameData[listG.size()];
+            int i = 0;
+            for (ListGameData game : listG) {
+                newList[i] = game;
+                i++;
+            }
+            return newList[index].gameID();
+        }catch(ArrayIndexOutOfBoundsException e){
+            throw new ResponseException("Game not be found",400);
+        }
     }
 
     private String join(String [] params) throws ResponseException{
@@ -110,27 +153,46 @@ public class ChessClient {
         if(params.length == 2){
             checkNumber(params[0]);
             checkColor(params[1]);
-            server.joinGame(authToken, new JoinGameData(params[1].toUpperCase(), Integer.parseInt(params[0])));
-            return "Successfully joined game! gameID: " + params[1];
+//            int index = Integer.parseInt(params[0])-1;
+//            var listG = server.listGames(authToken).games();
+//            ListGameData [] newList = new ListGameData[listG.size()];
+//            int i = 0;
+//            for(ListGameData game : listG){
+//                newList[i] = game;
+//                i++;
+//            }
+            int gameID = findGame(params);
+            server.joinGame(authToken, new JoinGameData(params[1].toUpperCase(), gameID));
+            state = INGAME;
+            ChessBoard joined = new ChessBoard();
+            joined.resetBoard();
+            ChessGame.TeamColor perspective;
+
+            if(params[1].equalsIgnoreCase("WHITE")){
+                perspective = WHITE;
+            }else{
+                perspective = BLACK;
+            }
+            String board = new RenderBoard(joined).drawBoard(perspective);
+            return board+"\nSuccessfully joined game!";
         }
         throw new ResponseException("Expected two inputs <ID> [WHITE|BLACK]", 400);
     }
 
     private String observe(String [] params) throws ResponseException{
+        //join on the list param index
         assertSignedIn();
         if(params.length == 1){
-            ListGamesResult result =  server.listGames(authToken);
-            for(ListGameData game : result.games()){
-                int gameID = checkNumber(params[0]);
-                if(game.gameID() == gameID){
-                    server.joinGame(authToken, new JoinGameData(null, game.gameID()));
-                    state = State.INGAME;
-                    ChessBoard observe = new ChessBoard();
-                    observe.resetBoard();
-                    return new RenderBoard(observe).drawBoard(WHITE);
-                }
+            try{
+                int gameNum = findGame(params);
+                server.joinGame(authToken, new JoinGameData(null, gameNum));
+                state = State.INGAME;
+                ChessBoard observe = new ChessBoard();
+                observe.resetBoard();
+                return new RenderBoard(observe).drawBoard(WHITE);
+            }catch(ArrayIndexOutOfBoundsException e){
+                throw new ResponseException("Game could not be found", 400);
             }
-            throw new ResponseException("Could not find game with gameID: " + params[0], 400);
         }
         throw new ResponseException("Expected one input <ID>", 400);
     }
@@ -157,6 +219,7 @@ public class ChessClient {
                     """;
         }
     }
+
 
     private void checkColor(String color){
         if(!color.equalsIgnoreCase("WHITE") && !color.equalsIgnoreCase("BLACK")){

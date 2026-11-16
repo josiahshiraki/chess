@@ -29,8 +29,8 @@ public class Repl {
                 var msg = e.toString();
                 System.out.println(msg);
             }
+            System.out.println();
         }
-        System.out.println();
     }
 
     private void printPrompt(){

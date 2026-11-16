@@ -15,13 +15,21 @@ public class RenderBoard {
     }
 
     public String drawBoard(ChessGame.TeamColor perspective){
-        String [] rank = {"a","b","c","d","e","f","g","h"};
+
+        String [] fileW = {"a","b","c","d","e","f","g","h"};
+        String [] fileB = {"h","g","f","e","d","c","b","a"};
         String boardString = " \u2003";
         //B[r][c]
         //true: WHITE ; false: BLACK
         boolean color = true;
-        for(String k : rank){
-            boardString += " "+k+"\u2003";
+        if(perspective == WHITE) {
+            for (String k : fileW) {
+                boardString += " " + k + "\u2003";
+            }
+        }else{
+            for (String k : fileB) {
+                boardString += " " + k + "\u2003";
+            }
         }
         boolean isWhite = perspective == WHITE;
 
@@ -43,9 +51,9 @@ public class RenderBoard {
                     pCol = board.getPiece(new ChessPosition(i, j)).getTeamColor();
                 }
                 if(color){
-                    boardString += printSquare(pCol, BLACK, pType);
-                }else{
                     boardString += printSquare(pCol, WHITE, pType);
+                }else{
+                    boardString += printSquare(pCol, BLACK, pType);
                 }
                 color = !color;
             }
@@ -53,44 +61,14 @@ public class RenderBoard {
             boardString += RESET_BG_COLOR+String.format("\u2003%d\n", i);
         }
         boardString += " \u2003";
-        for(String k : rank){
-            boardString += " "+k+"\u2003";
-        }
-        return boardString;
-    }
-
-    public String drawBoardT(ChessGame.TeamColor perspective){
-        String [] rank = {"a","b","c","d","e","f","g","h"};
-        String boardString = " \u2003";
-        //B[r][c]
-        //true: WHITE ; false: BLACK
-        boolean color = true;
-        for(String c : rank){
-            boardString += " "+c+"\u2003";
-        }
-        boardString += "\n";
-        for(int r = 1; r <= 8; r++){
-            boardString += r+"\u2003";
-            for(int c = 8; c >= 1; c--){
-                ChessPiece.PieceType pType = null;
-                ChessGame.TeamColor pCol = null;
-                if(board.getPiece(new ChessPosition(r,c)) != null){
-                    pType = board.getPiece(new ChessPosition(r,c)).getPieceType();
-                    pCol = board.getPiece(new ChessPosition(r,c)).getTeamColor();
-                }
-                if(color){
-                    boardString += printSquare(pCol, BLACK, pType);
-                }else{
-                    boardString += printSquare(pCol, WHITE, pType);
-                }
-                color = !color;
+        if(perspective == WHITE) {
+            for (String k : fileW) {
+                boardString += " " + k + "\u2003";
             }
-            color = !color;
-            boardString += RESET_BG_COLOR+String.format("\u2003%d\n",r);
-        }
-        boardString += " \u2003";
-        for(String c : rank){
-            boardString += " "+c+"\u2003";
+        }else{
+            for (String k : fileB) {
+                boardString += " " + k + "\u2003";
+            }
         }
         return boardString;
     }
