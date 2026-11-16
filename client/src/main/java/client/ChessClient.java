@@ -7,6 +7,7 @@ import server.ServerFacade;
 import ui.RenderBoard;
 
 import java.util.Arrays;
+import java.util.Locale;
 
 import static chess.ChessGame.TeamColor.WHITE;
 import static client.State.*;
@@ -26,8 +27,8 @@ public class ChessClient {
 
     public String eval(String userIn){
         //enforce SIGNED_IN and SIGNED_OUT checks, throw error is mismatch execution
+        //default should be -> enter valid command, case help
         try{
-
             //[toExecute, arg1, arg2, ...]
             String[] tokens = userIn.split(" ");
             String execute = tokens[0].toLowerCase();
@@ -69,6 +70,7 @@ public class ChessClient {
     }
 
     private String logout() throws ResponseException{
+        assertSignedIn();
         server.logout(authToken);
         this.authToken = "";
         state = State.SIGNED_OUT;
@@ -76,6 +78,7 @@ public class ChessClient {
     }
 
     private String createGame (String [] params) throws ResponseException{
+        assertSignedIn();
         if(params.length == 1){
             CreateGameResult res = server.createGame(authToken, new NewGame(params[0]));
             return "Successfully created game! gameID: " + res.gameID();
@@ -86,6 +89,7 @@ public class ChessClient {
     private String list() throws ResponseException{
         //Collection<ListGameData> games
         //ListGameData = {int gameID, String whiteUsername, String blackUsername, String gameName}
+        assertSignedIn();
         ListGamesResult result =  server.listGames(authToken);
         StringBuilder retString = new StringBuilder();
         int i = 0;
@@ -102,18 +106,22 @@ public class ChessClient {
     }
 
     private String join(String [] params) throws ResponseException{
+        assertSignedIn();
         if(params.length == 2){
-            server.joinGame(authToken, new JoinGameData(params[1], Integer.parseInt(params[0])));
+            checkNumber(params[0]);
+            checkColor(params[1]);
+            server.joinGame(authToken, new JoinGameData(params[1].toUpperCase(), Integer.parseInt(params[0])));
             return "Successfully joined game! gameID: " + params[1];
         }
         throw new ResponseException("Expected two inputs <ID> [WHITE|BLACK]", 400);
     }
 
     private String observe(String [] params) throws ResponseException{
+        assertSignedIn();
         if(params.length == 1){
             ListGamesResult result =  server.listGames(authToken);
             for(ListGameData game : result.games()){
-                int gameID = Integer.parseInt(params[0]);
+                int gameID = checkNumber(params[0]);
                 if(game.gameID() == gameID){
                     server.joinGame(authToken, new JoinGameData(null, game.gameID()));
                     state = State.INGAME;
@@ -147,6 +155,22 @@ public class ChessClient {
                     quit - playing chess
                     help - display possible commands
                     """;
+        }
+    }
+
+    private void checkColor(String color){
+        if(!color.equalsIgnoreCase("WHITE") && !color.equalsIgnoreCase("BLACK")){
+            throw new ResponseException("Color must be WHITE or BLACK", 400);
+        }
+    }
+
+    private int checkNumber(String toCheck){
+        int gameNumber;
+        try {
+            gameNumber = Integer.parseInt(toCheck);
+            return gameNumber;
+        } catch (NumberFormatException e) {
+            throw new ResponseException("Game number must be an number", 400);
         }
     }
 
