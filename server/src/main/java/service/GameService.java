@@ -67,19 +67,21 @@ public class GameService {
     }
 
     public void joinGame(String authToken, JoinGameData joinData) {
+        System.out.println("Game found: " + joinData.gameID());
         try {
-            if(authDAO.getAuth(authToken) == null){
+            if (authDAO.getAuth(authToken) == null) {
                 throw new UnauthorizedException("Error: unauthorized");
             }
         } catch (DataAccessException e) {
             throw new RuntimeException(e);
         }
-        if (joinData == null || joinData.playerColor() == null) { // can gameId be null?
-            throw new BadRequestException("Error: bad request");
-        }
+
+
+
         String color = joinData.playerColor();
         int gameId = joinData.gameID();
-        GameData game = null;
+
+        GameData game;
         try {
             game = gameDAO.getGame(gameId);
         } catch (DataAccessException e) {
@@ -89,23 +91,23 @@ public class GameService {
         if (game == null) {
             throw new BadRequestException("Error: bad request");
         }
-        if (!color.equals("WHITE") && !color.equals("BLACK")){
+        if (color == null) {
+            return;
+        }
+        if (!color.equals("WHITE") && !color.equals("BLACK")) {
             throw new BadRequestException("Error: bad request");
         }
-        if(color.equals("WHITE") && game.whiteUsername() != null){
+
+        if (color.equals("WHITE") && game.whiteUsername() != null) {
             throw new AlreadyTakenException("Error: already taken");
         }
-        if(color.equals("BLACK") && game.blackUsername() != null){
-            throw new AlreadyTakenException("error: already taken");
+
+        if (color.equals("BLACK") && game.blackUsername() != null) {
+            throw new AlreadyTakenException("Error: already taken");
         }
 
-        String username = null;
         try {
-            username = authDAO.getAuth(authToken).username();
-        } catch (DataAccessException e) {
-            throw new RuntimeException(e);
-        }
-        try {
+            String username = authDAO.getAuth(authToken).username();
             gameDAO.joinGame(gameId, username, color);
         } catch (DataAccessException e) {
             throw new RuntimeException(e);

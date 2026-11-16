@@ -36,6 +36,7 @@ public class GameHandler {
         String authToken = ctx.header("authorization");
         JoinGameData joinData = new Gson().fromJson(ctx.body(), JoinGameData.class);
 
+
         gameService.joinGame(authToken, joinData);
 
         ctx.status(200);

@@ -34,7 +34,7 @@ public class Repl {
     }
 
     private void printPrompt(){
-        System.out.println("["+chessClient.getState()+"] " + ">>>");
+        System.out.print("["+chessClient.getState()+"] " + ">>> ");
     }
 
 }

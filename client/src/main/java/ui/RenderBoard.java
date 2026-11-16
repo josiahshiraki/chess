@@ -34,7 +34,7 @@ public class RenderBoard {
         boardString += "\n";
         for(int i=rowStart; i>=1 && i<=8;i+=rowStep){
             boardString += i +"\u2003";
-            for(int j=colStart; j<=8&&j>=1; j+=colStep){
+            for(int j=colStart; j<=8 && j>=1; j+=colStep){
 
                 ChessPiece.PieceType pType = null;
                 ChessGame.TeamColor pCol = null;

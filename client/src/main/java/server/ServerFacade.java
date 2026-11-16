@@ -60,8 +60,15 @@ public class ServerFacade {
     }
 
     public void joinGame(String authToken, JoinGameData joinData) throws ResponseException{
+
         var request = buildRequest("PUT", "/game", joinData, authToken);
+        System.out.println("URL: " + request.uri());
+        System.out.println("BODY: " + new Gson().toJson(joinData));
+
         var response = sendRequest(request);
+
+        System.out.println("STATUS: " + response.statusCode());
+        System.out.println("RESPONSE: " + response.body());
         handleResponse(response, null);
     }
 

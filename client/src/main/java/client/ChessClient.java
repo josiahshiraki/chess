@@ -1,7 +1,6 @@
 package client;
 
 import chess.ChessBoard;
-import chess.ChessGame;
 import exception.ResponseException;
 import model.*;
 import server.ServerFacade;
@@ -9,6 +8,7 @@ import ui.RenderBoard;
 
 import java.util.Arrays;
 
+import static chess.ChessGame.TeamColor.WHITE;
 import static client.State.*;
 
 public class ChessClient {
@@ -27,6 +27,7 @@ public class ChessClient {
     public String eval(String userIn){
         //enforce SIGNED_IN and SIGNED_OUT checks, throw error is mismatch execution
         try{
+
             //[toExecute, arg1, arg2, ...]
             String[] tokens = userIn.split(" ");
             String execute = tokens[0].toLowerCase();
@@ -118,7 +119,7 @@ public class ChessClient {
                     state = State.INGAME;
                     ChessBoard observe = new ChessBoard();
                     observe.resetBoard();
-                    return new RenderBoard(observe).drawBoard(ChessGame.TeamColor.WHITE);
+                    return new RenderBoard(observe).drawBoard(WHITE);
                 }
             }
             throw new ResponseException("Could not find game with gameID: " + params[0], 400);
@@ -140,8 +141,8 @@ public class ChessClient {
             return """
                     create <NAME> - a game
                     list - games
-                    join <ID> - a game
-                    observe <ID> [WHITE|BLACK]- a game
+                    join <ID> [WHITE|BLACK] - a game
+                    observe <ID> - a game
                     logout - when you are done
                     quit - playing chess
                     help - display possible commands
